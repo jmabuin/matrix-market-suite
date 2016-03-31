@@ -177,3 +177,6 @@ int writeDenseVector(char *fileName, double *values,unsigned long M,unsigned lon
 	
 	return 1;
 }
+
+
+
