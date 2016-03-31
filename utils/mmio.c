@@ -323,6 +323,21 @@ int mm_read_mtx_crd_entry(FILE *f, unsigned long *I, unsigned long *J,
 }
 
 
+int mm_read_vector_data(FILE *f, unsigned long long nz,double val[], MM_typecode matcode) {
+
+	unsigned long long i;
+	if (mm_is_array(matcode)) {
+		for (i=0; i<nz; i++)
+			if (fscanf(f, "%lg", &val[i]) != 1) return MM_PREMATURE_EOF;
+	}
+	else {
+		return MM_UNSUPPORTED_TYPE;
+	}
+
+	return 0;
+}
+
+
 /************************************************************************
     mm_read_mtx_crd()  fills M, N, nz, array of values, and return
                         type code, e.g. 'MCRS'

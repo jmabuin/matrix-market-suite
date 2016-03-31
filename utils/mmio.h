@@ -128,6 +128,6 @@ int mm_read_mtx_crd_entry(FILE *f, unsigned long *I, unsigned long *J, double *r
 int mm_read_unsymmetric_sparse(const char *fname, unsigned long *M_, unsigned long *N_, unsigned long long *nz_,
                 double **val_, unsigned long **I_, unsigned long **J_);
 
-
+int mm_read_vector_data(FILE *f, unsigned long long nz,double val[], MM_typecode matcode);
 
 #endif
