@@ -15,6 +15,7 @@ int CreateDenseMatrixSymmetric(int argc, char *argv[]) {
 	mm_initialize_typecode(&outputmatcode);
 	mm_set_matrix(&outputmatcode);
 	mm_set_coordinate(&outputmatcode);
+	//mm_set_dense(&outputmatcode);
 	mm_set_real(&outputmatcode);
 	mm_set_symmetric(&outputmatcode);
 	
