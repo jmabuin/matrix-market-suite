@@ -12,7 +12,7 @@ SUBCLEAN = $(addsuffix .clean,$(SUBDIRS))
 OBJECTS= io/CreateDenseMatrixSymmetric.o io/CreateDenseVector.o \
 	utils/utils.o utils/mmio.o operations/DMxV.o
 
-LIBS =
+LIBS = -lblas
 INCLUDES =
 
 .PHONY: all

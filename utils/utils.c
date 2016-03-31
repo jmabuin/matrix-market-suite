@@ -126,7 +126,7 @@ int readDenseVector(char *fileName, double **values,unsigned long *M,unsigned lo
 
 	*values = (double *)  malloc(*nz * sizeof(double));
 	
-	//mm_read_vector_data(FILE *f, unsigned long long nz,double val[], MM_typecode matcode)
+
 	if(mm_read_vector_data(inputVector,*nz,*values,inputmatcode) != 0){
 		fprintf(stderr,"[%s] Error reading vector values\n",__func__);
 		return 0;
@@ -135,9 +135,45 @@ int readDenseVector(char *fileName, double **values,unsigned long *M,unsigned lo
 
 	fclose(inputVector);
 
-	//mm_write_mtx_crd("stdout",*M,*N,*nz,I,J,values,inputmatcode);
 
 	return 1;
 
 }
 
+
+int writeDenseVector(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz) {
+
+	FILE *f;
+
+	if(strcmp(fileName,"stdout")==0){
+		f = stdout;
+	}
+	else{
+		if ((f = fopen(fileName, "w")) == NULL){
+			fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
+			return 0;
+		}
+	}
+	
+	MM_typecode outputmatcode;
+	
+	mm_initialize_typecode(&outputmatcode);
+	mm_set_array(&outputmatcode);
+	mm_set_dense(&outputmatcode);
+	mm_set_real(&outputmatcode);
+
+	
+	mm_write_banner(f, outputmatcode);
+	mm_write_mtx_array_size(f, M, N);
+	
+	for(unsigned long i = 0;i < M; i++){
+
+		fprintf(f, "%lg\n",values[i]);
+	}
+	
+	if(f!=stdout){
+		fclose(f);
+	}
+	
+	return 1;
+}
