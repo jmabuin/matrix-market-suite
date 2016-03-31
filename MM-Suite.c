@@ -5,6 +5,7 @@
 #include "io/CreateDenseMatrixSymmetric.h"
 #include "io/CreateDenseVector.h"
 
+#include "operations/DMxV.h"
 
 #ifndef PACKAGE_VERSION
 #define PACKAGE_VERSION "0.0.1"
@@ -65,6 +66,7 @@ int main(int argc, char *argv[])
 
 	if (strcmp(argv[1], "CreateDenseMatrixSymmetric") == 0) ret = CreateDenseMatrixSymmetric(argc-1, argv+1);
 	else if (strcmp(argv[1], "CreateDenseVector") == 0) ret = CreateDenseVector(argc-1, argv+1);
+	else if (strcmp(argv[1], "DMxV") == 0) ret = DMxV(argc-1, argv+1);
 /*	else if (strcmp(argv[1], "pac2bwtgen") == 0) ret = bwt_bwtgen_main(argc-1, argv+1);
 	else if (strcmp(argv[1], "bwtupdate") == 0) ret = bwa_bwtupdate(argc-1, argv+1);
 	else if (strcmp(argv[1], "bwt2sa") == 0) ret = bwa_bwt2sa(argc-1, argv+1);
