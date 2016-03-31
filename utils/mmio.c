@@ -14,15 +14,16 @@
 
 #include "mmio.h"
 
-int mm_read_unsymmetric_sparse(const char *fname, int *M_, int *N_, int *nz_,
-                double **val_, int **I_, int **J_)
+int mm_read_unsymmetric_sparse(const char *fname, unsigned long *M_, unsigned long *N_, unsigned long long *nz_,
+                double **val_, unsigned long **I_, unsigned long **J_)
 {
     FILE *f;
     MM_typecode matcode;
-    int M, N, nz;
-    int i;
+    unsigned long M, N;
+    unsigned long long nz;
+    unsigned long long i;
     double *val;
-    int *I, *J;
+    unsigned long *I, *J;
  
     if ((f = fopen(fname, "r")) == NULL)
             return -1;
@@ -60,8 +61,8 @@ int mm_read_unsymmetric_sparse(const char *fname, int *M_, int *N_, int *nz_,
  
     /* reseve memory for matrices */
  
-    I = (int *) malloc(nz * sizeof(int));
-    J = (int *) malloc(nz * sizeof(int));
+    I = (unsigned long *) malloc(nz * sizeof(unsigned long));
+    J = (unsigned long *) malloc(nz * sizeof(unsigned long));
     val = (double *) malloc(nz * sizeof(double));
  
     *val_ = val;
@@ -74,7 +75,7 @@ int mm_read_unsymmetric_sparse(const char *fname, int *M_, int *N_, int *nz_,
  
     for (i=0; i<nz; i++)
     {
-        fscanf(f, "%d %d %lg\n", &I[i], &J[i], &val[i]);
+        fscanf(f, "%lu %lu %lg\n", &I[i], &J[i], &val[i]);
         I[i]--;  /* adjust from 1-based to 0-based */
         J[i]--;
     }
@@ -178,15 +179,15 @@ int mm_read_banner(FILE *f, MM_typecode *matcode)
     return 0;
 }
 
-int mm_write_mtx_crd_size(FILE *f, int M, int N, int nz)
+int mm_write_mtx_crd_size(FILE *f, unsigned long M, unsigned long N, unsigned long long nz)
 {
-    if (fprintf(f, "%d %d %d\n", M, N, nz) != 3)
+    if (fprintf(f, "%lu %lu %llu\n", M, N, nz) != 3)
         return MM_COULD_NOT_WRITE_FILE;
     else 
         return 0;
 }
 
-int mm_read_mtx_crd_size(FILE *f, int *M, int *N, int *nz )
+int mm_read_mtx_crd_size(FILE *f, unsigned long *M, unsigned long *N, unsigned long long *nz )
 {
     char line[MM_MAX_LINE_LENGTH];
     int num_items_read;
@@ -202,13 +203,13 @@ int mm_read_mtx_crd_size(FILE *f, int *M, int *N, int *nz )
     }while (line[0] == '%');
 
     /* line[] is either blank or has M,N, nz */
-    if (sscanf(line, "%d %d %d", M, N, nz) == 3)
+    if (sscanf(line, "%lu %lu %llu", M, N, nz) == 3)
         return 0;
         
     else
     do
     { 
-        num_items_read = fscanf(f, "%d %d %d", M, N, nz); 
+        num_items_read = fscanf(f, "%lu %lu %llu", M, N, nz); 
         if (num_items_read == EOF) return MM_PREMATURE_EOF;
     }
     while (num_items_read != 3);
@@ -217,7 +218,7 @@ int mm_read_mtx_crd_size(FILE *f, int *M, int *N, int *nz )
 }
 
 
-int mm_read_mtx_array_size(FILE *f, int *M, int *N)
+int mm_read_mtx_array_size(FILE *f, unsigned long *M, unsigned long *N)
 {
     char line[MM_MAX_LINE_LENGTH];
     int num_items_read;
@@ -232,13 +233,13 @@ int mm_read_mtx_array_size(FILE *f, int *M, int *N)
     }while (line[0] == '%');
 
     /* line[] is either blank or has M,N, nz */
-    if (sscanf(line, "%d %d", M, N) == 2)
+    if (sscanf(line, "%lu %lu", M, N) == 2)
         return 0;
         
     else /* we have a blank line */
     do
     { 
-        num_items_read = fscanf(f, "%d %d", M, N); 
+        num_items_read = fscanf(f, "%lu %lu", M, N); 
         if (num_items_read == EOF) return MM_PREMATURE_EOF;
     }
     while (num_items_read != 2);
@@ -246,9 +247,9 @@ int mm_read_mtx_array_size(FILE *f, int *M, int *N)
     return 0;
 }
 
-int mm_write_mtx_array_size(FILE *f, int M, int N)
+int mm_write_mtx_array_size(FILE *f, unsigned long M, unsigned long N)
 {
-    if (fprintf(f, "%d %d\n", M, N) != 2)
+    if (fprintf(f, "%lu %lu\n", M, N) != 2)
         return MM_COULD_NOT_WRITE_FILE;
     else 
         return 0;
@@ -262,21 +263,21 @@ int mm_write_mtx_array_size(FILE *f, int M, int N)
 /* use when I[], J[], and val[]J, and val[] are already allocated */
 /******************************************************************/
 
-int mm_read_mtx_crd_data(FILE *f, int M, int N, int nz, int I[], int J[],
+int mm_read_mtx_crd_data(FILE *f, unsigned long M, unsigned long N, unsigned long long nz, unsigned long I[], unsigned long J[],
         double val[], MM_typecode matcode)
 {
-    int i;
+    unsigned long long i;
     if (mm_is_complex(matcode))
     {
         for (i=0; i<nz; i++)
-            if (fscanf(f, "%d %d %lg %lg", &I[i], &J[i], &val[2*i], &val[2*i+1])
+            if (fscanf(f, "%lu %lu %lg %lg", &I[i], &J[i], &val[2*i], &val[2*i+1])
                 != 4) return MM_PREMATURE_EOF;
     }
     else if (mm_is_real(matcode))
     {
         for (i=0; i<nz; i++)
         {
-            if (fscanf(f, "%d %d %lg\n", &I[i], &J[i], &val[i])
+            if (fscanf(f, "%lu %lu %lg\n", &I[i], &J[i], &val[i])
                 != 3) return MM_PREMATURE_EOF;
 
         }
@@ -285,7 +286,7 @@ int mm_read_mtx_crd_data(FILE *f, int M, int N, int nz, int I[], int J[],
     else if (mm_is_pattern(matcode))
     {
         for (i=0; i<nz; i++)
-            if (fscanf(f, "%d %d", &I[i], &J[i])
+            if (fscanf(f, "%lu %lu", &I[i], &J[i])
                 != 2) return MM_PREMATURE_EOF;
     }
     else
@@ -295,24 +296,24 @@ int mm_read_mtx_crd_data(FILE *f, int M, int N, int nz, int I[], int J[],
         
 }
 
-int mm_read_mtx_crd_entry(FILE *f, int *I, int *J,
+int mm_read_mtx_crd_entry(FILE *f, unsigned long *I, unsigned long *J,
         double *real, double *imag, MM_typecode matcode)
 {
     if (mm_is_complex(matcode))
     {
-            if (fscanf(f, "%d %d %lg %lg", I, J, real, imag)
+            if (fscanf(f, "%lu %lu %lg %lg", I, J, real, imag)
                 != 4) return MM_PREMATURE_EOF;
     }
     else if (mm_is_real(matcode))
     {
-            if (fscanf(f, "%d %d %lg\n", I, J, real)
+            if (fscanf(f, "%lu %lu %lg\n", I, J, real)
                 != 3) return MM_PREMATURE_EOF;
 
     }
 
     else if (mm_is_pattern(matcode))
     {
-            if (fscanf(f, "%d %d", I, J) != 2) return MM_PREMATURE_EOF;
+            if (fscanf(f, "%lu %lu", I, J) != 2) return MM_PREMATURE_EOF;
     }
     else
         return MM_UNSUPPORTED_TYPE;
@@ -330,7 +331,7 @@ int mm_read_mtx_crd_entry(FILE *f, int *I, int *J,
                             (nz pairs of real/imaginary values)
 ************************************************************************/
 
-int mm_read_mtx_crd(char *fname, int *M, int *N, int *nz, int **I, int **J, 
+int mm_read_mtx_crd(char *fname, unsigned long *M, unsigned long *N, unsigned long long *nz, unsigned long **I, unsigned long **J, 
         double **val, MM_typecode *matcode)
 {
     int ret_code;
@@ -353,8 +354,8 @@ int mm_read_mtx_crd(char *fname, int *M, int *N, int *nz, int **I, int **J,
         return ret_code;
 
 
-    *I = (int *)  malloc(*nz * sizeof(int));
-    *J = (int *)  malloc(*nz * sizeof(int));
+    *I = (unsigned long *)  malloc(*nz * sizeof(unsigned long));
+    *J = (unsigned long *)  malloc(*nz * sizeof(unsigned long));
     *val = NULL;
 
     if (mm_is_complex(*matcode))
@@ -396,7 +397,7 @@ int mm_write_banner(FILE *f, MM_typecode matcode)
         return 0;
 }
 
-int mm_write_mtx_crd(char fname[], int M, int N, int nz, int I[], int J[],
+int mm_write_mtx_crd(char fname[], unsigned long M, unsigned long N, unsigned long long nz, unsigned long I[], unsigned long J[],
         double val[], MM_typecode matcode)
 {
     FILE *f;
@@ -413,20 +414,20 @@ int mm_write_mtx_crd(char fname[], int M, int N, int nz, int I[], int J[],
     fprintf(f, "%s\n", mm_typecode_to_str(matcode));
 
     /* print matrix sizes and nonzeros */
-    fprintf(f, "%d %d %d\n", M, N, nz);
+    fprintf(f, "%lu %lu %llu\n", M, N, nz);
 
     /* print values */
     if (mm_is_pattern(matcode))
         for (i=0; i<nz; i++)
-            fprintf(f, "%d %d\n", I[i], J[i]);
+            fprintf(f, "%lu %lu\n", I[i], J[i]);
     else
     if (mm_is_real(matcode))
         for (i=0; i<nz; i++)
-            fprintf(f, "%d %d %20.16g\n", I[i], J[i], val[i]);
+            fprintf(f, "%lu %lu %20.16g\n", I[i], J[i], val[i]);
     else
     if (mm_is_complex(matcode))
         for (i=0; i<nz; i++)
-            fprintf(f, "%d %d %20.16g %20.16g\n", I[i], J[i], val[2*i], 
+            fprintf(f, "%lu %lu %20.16g %20.16g\n", I[i], J[i], val[2*i], 
                         val[2*i+1]);
     else
     {
