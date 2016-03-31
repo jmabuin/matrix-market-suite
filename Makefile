@@ -5,14 +5,16 @@ DFLAGS=			-DHAVE_PTHREAD $(WRAP_MALLOC)
 
 PROG=			MM-Suite
 
-SUBDIRS= io operations utils
+SUBDIRS= io operations utils solvers
 
 SUBCLEAN = $(addsuffix .clean,$(SUBDIRS))
 
 OBJECTS= io/CreateDenseMatrixSymmetric.o io/CreateDenseVector.o \
-	utils/utils.o utils/mmio.o operations/DMxV.o
+	utils/utils.o utils/mmio.o \
+	operations/DMxV.o operations/VectorOperations.o \
+	solvers/ConjugateGradient.o
 
-LIBS = -lblas
+LIBS = -lblas -lm
 INCLUDES =
 
 .PHONY: all
