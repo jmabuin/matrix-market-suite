@@ -27,11 +27,16 @@ int DMxV(int argc, char *argv[]) {
 	unsigned long N_Vector;
 	unsigned long long nz_vector;
 	
+	int write2file = 0;
 	
 	if (argc < 3)
 	{
 		fprintf(stderr, "[%s] Usage: %s [input-matrix-file] [input-vector-file]\n",__func__, argv[0]);
 		return 0;
+	}
+	
+	if(argc == 4){
+		write2file = 1;
 	}
 	
 	//Read matrix
@@ -56,10 +61,14 @@ int DMxV(int argc, char *argv[]) {
         
         double *result=(double *) malloc(nz_vector * sizeof(double));
         
-	cblas_dgemv(CblasColMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,1.0,result,1);
+	cblas_dgemv(CblasColMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
 	
-	writeDenseVector("stdout", result,M_Vector,N_Vector,nz_vector);
-	
+	if(write2file){
+		writeDenseVector(argv[3], result,M_Vector,N_Vector,nz_vector);
+	}
+	else{
+		writeDenseVector("stdout", result,M_Vector,N_Vector,nz_vector);
+	}
 	return 1;
 }
 
