@@ -50,16 +50,16 @@ int ConjugateGradient(int argc, char *argv[]) {
         
         //double *y=(double *) malloc(nz_vector * sizeof(double));
         
-	int ret_value = ConjugateGradientSolver(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector);
+	ret_code = ConjugateGradientSolver(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector);
 	
-	if(ret_value){
+	if(ret_code){
 		writeDenseVector("stdout", b,M_Vector,N_Vector,nz_vector);
 		//fprintf(stderr, "[%s] Number of iterations %lu\n",__func__,k);
 	}
 	else{
-		printf(stderr,"[%s] Error executing ConjugateGradientSolver\n",__func__);
+		fprintf(stderr,"[%s] Error executing ConjugateGradientSolver\n",__func__);
 	
 	}
-	return ret_value;
+	return ret_code;
 }
 

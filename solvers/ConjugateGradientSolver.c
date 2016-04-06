@@ -44,7 +44,7 @@ int ConjugateGradientSolver(unsigned long *I, unsigned long *J, double *A, unsig
 	//unsigned long maxIterations = 1;
 	
 	//double tmp = 0.0;
-	MM_typecode matcode;
+	//MM_typecode matcode;
 	
 
 	while(!stop){
@@ -81,6 +81,12 @@ int ConjugateGradientSolver(unsigned long *I, unsigned long *J, double *A, unsig
 	}
 	
 	memcpy(b, x, N*sizeof(double));
+
+	free(Ax);
+        free(Ap);
+        free(r);
+        free(p);
+	free(x);
 
 	fprintf(stderr, "[%s] Number of iterations %lu\n",__func__,k);
 

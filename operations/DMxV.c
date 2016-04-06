@@ -11,7 +11,7 @@ int DMxV(int argc, char *argv[]) {
 
 	
 	//int i;
-	int ret_code;
+	int ret_code = 1;
 	
 	unsigned long *I;
 	unsigned long *J;
@@ -69,6 +69,7 @@ int DMxV(int argc, char *argv[]) {
 	else{
 		writeDenseVector("stdout", result,M_Vector,N_Vector,nz_vector);
 	}
-	return 1;
+	
+	return ret_code;
 }
 
