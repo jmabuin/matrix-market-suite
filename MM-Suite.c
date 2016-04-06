@@ -10,7 +10,7 @@
 #include "solvers/ConjugateGradient.h"
 
 #ifndef PACKAGE_VERSION
-#define PACKAGE_VERSION "0.0.1"
+#define PACKAGE_VERSION "0.0.2"
 #endif
 
 
@@ -21,15 +21,15 @@ static int usage()
 	fprintf(stderr, "Version: %s\n", PACKAGE_VERSION);
 	fprintf(stderr, "Contact: José M. Abuín <josemanuel.abuin@usc.es>\n\n");
 	fprintf(stderr, "Usage:   MM-Suite <command> [options]\n\n");
-	fprintf(stderr, "--------------------------------Input/Output--------------------------------\n");
+	fprintf(stderr, "Input/Output:\n");
 	fprintf(stderr, "Command: CreateDenseMatrixSymmetric         creates a dense symmetric matrix\n");
 	fprintf(stderr, "         CreateDenseVector                  creates a dense vector\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "------------------------------Basic operations------------------------------\n");
-	fprintf(stderr, "Command: DMxV         Dense matrix dot vector operation\n");
+	fprintf(stderr, "Basic operations:\n");
+	fprintf(stderr, "Command: DMxV                               Dense matrix dot vector operation\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "-----------------------------------Solvers----------------------------------\n");
-	fprintf(stderr, "Command: ConjugateGradient         Solve a system by using the conjugate gradient method\n");
+	fprintf(stderr, "Solvers:\n");
+	fprintf(stderr, "Command: ConjugateGradient                  Solves a system by using the conjugate gradient method\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 	
 	for (i = 1; i < argc; ++i) fprintf(stderr, " %s", argv[i]);
 	
-	fprintf(stderr, "\n\n");
+	fprintf(stderr, "\n");
 
 	if (argc < 2) return usage();
 
