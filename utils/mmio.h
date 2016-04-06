@@ -129,5 +129,6 @@ int mm_read_unsymmetric_sparse(const char *fname, unsigned long *M_, unsigned lo
                 double **val_, unsigned long **I_, unsigned long **J_);
 
 int mm_read_vector_data(FILE *f, unsigned long long nz,double val[], MM_typecode matcode);
+//int mm_write_vector_data(char *fname, unsigned long long nz,unsigned long M, unsigned long N,double val[], MM_typecode matcode);
 
 #endif

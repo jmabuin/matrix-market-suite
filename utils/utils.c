@@ -144,7 +144,8 @@ int readDenseVector(char *fileName, double **values,unsigned long *M,unsigned lo
 int writeDenseVector(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz) {
 
 	FILE *f;
-
+	unsigned long i = 0;
+	
 	if(strcmp(fileName,"stdout")==0){
 		f = stdout;
 	}
@@ -166,7 +167,7 @@ int writeDenseVector(char *fileName, double *values,unsigned long M,unsigned lon
 	mm_write_banner(f, outputmatcode);
 	mm_write_mtx_array_size(f, M, N);
 	
-	for(unsigned long i = 0;i < M; i++){
+	for(i = 0;i < M; i++){
 
 		fprintf(f, "%lg\n",values[i]);
 	}

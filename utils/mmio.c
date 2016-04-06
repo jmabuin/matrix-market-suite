@@ -336,8 +336,43 @@ int mm_read_vector_data(FILE *f, unsigned long long nz,double val[], MM_typecode
 
 	return 0;
 }
+/*
+int mm_write_vector_data(char *fname, unsigned long long nz,unsigned long M, unsigned long N,double val[], MM_typecode matcode) {
 
+	FILE *f;
+	int write2file = 0;
+    	if (strcmp(fname, "stdout") == 0) {
+    		f=stdout;
+    	}
+    	else {
+    		if ((f = fopen(fname, "r")) == NULL) {
+	        	return MM_COULD_NOT_READ_FILE;
+	        }
+	        write2file = 1;
+    	}
+    	
 
+	unsigned long long i;
+	
+	
+	mm_write_banner(f, matcode);
+	mm_write_mtx_array_size(f,M,N);
+	
+	if (mm_is_array(matcode)) {
+		for (i=0; i<nz; i++)
+			fprintf(f,"%g\n",val[i]);
+	}
+	else {
+		return MM_UNSUPPORTED_TYPE;
+	}
+
+	if(write2file){
+		fclose(f);
+	}
+
+	return 0;
+}
+*/
 /************************************************************************
     mm_read_mtx_crd()  fills M, N, nz, array of values, and return
                         type code, e.g. 'MCRS'
