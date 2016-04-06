@@ -25,14 +25,14 @@ This command creates the *MM-Suite* executable.
 Available commands are:
 
 * Input/Output
-** CreateDenseMatrixSymmetric		creates a dense symmetric matrix
-** CreateDenseVector			creates a dense vector
+- **CreateDenseMatrixSymmetric		creates a dense symmetric matrix
+- **CreateDenseVector			creates a dense vector
 
 * Basic operations
-** DMxV					Dense matrix dot vector operation
+- **DMxV					Dense matrix dot vector operation
 
 * Solvers
-** ConjugateGradient			Solves a system by using the conjugate gradient method
+- **ConjugateGradient			Solves a system by using the conjugate gradient method
 
 
 # 4. Examples
