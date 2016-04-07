@@ -1,11 +1,11 @@
 CC=			gcc
-CFLAGS=			-g -Wall -Wno-unused-function -O2 
+CFLAGS=			-g -Wall -Wno-unused-function -O2
 WRAP_MALLOC=		-DUSE_MALLOC_WRAPPERS
 DFLAGS=			-DHAVE_PTHREAD $(WRAP_MALLOC)
 
 PROG=			MM-Suite
 
-SUBDIRS= io operations utils solvers
+SUBDIRS= io operations utils solvers lib/CBLAS
 
 SUBCLEAN = $(addsuffix .clean,$(SUBDIRS))
 
@@ -14,7 +14,9 @@ OBJECTS= io/CreateDenseMatrixSymmetric.o io/CreateDenseVector.o \
 	operations/DMxV.o operations/VectorOperations.o \
 	solvers/ConjugateGradient.o solvers/ConjugateGradientSolver.o
 
-LIBS = -lblas -lm
+CBLAS_DIR = ./lib/CBLAS/lib/
+
+LIBS = -L$(CBLAS_DIR) -lcblas -lm -lblas
 INCLUDES =
 
 .PHONY: all
