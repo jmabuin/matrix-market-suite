@@ -120,6 +120,7 @@ Where:
 * *Result-CG.mtx* Is the result from the previous example.
 
 The result is:
+
 	%%MatrixMarket matrix array real general
 	10 1
 	0.193531
