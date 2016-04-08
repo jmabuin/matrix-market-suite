@@ -1,3 +1,21 @@
+/**
+  * Copyright 2016 José Manuel Abuín Mosquera <josemanuel.abuin@usc.es>
+  * 
+  * This file is part of Matrix Market Suite.
+  *
+  * Matrix Market Suite is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation, either version 3 of the License, or
+  * (at your option) any later version.
+  *
+  * Matrix Market Suite is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+  * 
+  * You should have received a copy of the GNU General Public License
+  * along with Matrix Market Suite. If not, see <http://www.gnu.org/licenses/>.
+  */
 
 #include "../operations/cblas.h"
 #include "ConjugateGradientSolver.h"
@@ -41,7 +59,7 @@ int ConjugateGradientSolver(unsigned long *I, unsigned long *J, double *A, unsig
 	unsigned long k = 0;
 	
 	unsigned long maxIterations = M*2;
-	//unsigned long maxIterations = 1;
+	//unsigned long maxIterations = 10;
 	
 	//double tmp = 0.0;
 	//MM_typecode matcode;
@@ -51,14 +69,12 @@ int ConjugateGradientSolver(unsigned long *I, unsigned long *J, double *A, unsig
 	
 		//Ap=A*p
 		cblas_dgemv(CblasColMajor, CblasNoTrans, M,N , 1.0, A, N, p, 1, 0.0, Ap, 1);
-	
+
 		//alphaCG=rsold/(p'*Ap)
 		alphaCG = rsold/cblas_ddot(N,p,1,Ap,1);
 		
 		//x=x+alphaCG*p
 		cblas_daxpy(N,alphaCG,p,1,x,1);
-		
-		//writeDenseVector("stdout",x,M_Vector,N_Vector,nz_vector);
 
 		//r=r-alphaCG*Ap
 		cblas_daxpy(N,-alphaCG,Ap,1,r,1);
