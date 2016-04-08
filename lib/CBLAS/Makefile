@@ -145,6 +145,7 @@ dcplx3:
 allprecision3:
 	( cd src && make all3)
 allprecision:
+	if [ ! -d "./lib/" ]; then mkdir ./lib/; fi
 	( cd src && make all)
 
 stest1: 
