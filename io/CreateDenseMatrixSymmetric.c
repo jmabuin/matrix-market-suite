@@ -41,7 +41,7 @@ int CreateDenseMatrixSymmetric(int argc, char *argv[]) {
 	unsigned long int numCols = 0;
 	unsigned int seed = 0;
 
-	double valor = 0.0;
+	//double valor = 0.0;
 
 	//int ret_code;
 
@@ -61,10 +61,8 @@ int CreateDenseMatrixSymmetric(int argc, char *argv[]) {
 	
 	unsigned long long int nnz = numRows*numCols;
 	
-	double *values =  (double *) calloc(nnz,sizeof(double));
-	
-	//nz = numRows * numCols;
-	//sscanf (argv[3],"%d",&blockSize);
+	//double *values =  (double *) calloc(nnz,sizeof(double));
+	double value = 0.0;
 	
 	srand (seed);
 
@@ -79,37 +77,15 @@ int CreateDenseMatrixSymmetric(int argc, char *argv[]) {
 	
 	for(i = 0;i < numRows; i++){
 	
-		//This loop is for assigning values to places that are no in the diagonal
-		for(j = 0; j<i; j++){
+		for(j = 0; j<=i; j++){
 
-			//valor = ((double)rand() / (double)RAND_MAX)/100;
-			valor = ((double)rand() / (double)RAND_MAX);
-			val1 = j+(i*numCols);
-			values[val1] = valor;
-			
-			val2 = i+(j*numCols);
-			values[val2] = valor;
-
+			value = ((double)rand() / (double)RAND_MAX)/100;
+			fprintf(output, "%d %d %f\n",i+1,j+1,value);
 
 		}
 
-		//Elements in the diagonal, i = j
-		
-		//valor = ((double)rand() / (double)RAND_MAX)/100;
-		valor = ((double)rand() / (double)RAND_MAX);
-		values[j+(i*numCols)] = valor;
 	}
 	
-	//Write to file
-	for(i = 0;i < numRows; i++){
-
-		for(j = 0; j<numCols; j++){
-			
-			fprintf(output, "%d %d %f\n",i+1,j+1,values[j+(i*numCols)]);
-
-		}
-
-	}
 
 	fclose(output);
 

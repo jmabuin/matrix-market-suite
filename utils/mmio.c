@@ -266,32 +266,66 @@ int mm_write_mtx_array_size(FILE *f, unsigned long M, unsigned long N)
 int mm_read_mtx_crd_data(FILE *f, unsigned long M, unsigned long N, unsigned long long nz, unsigned long I[], unsigned long J[],
         double val[], MM_typecode matcode)
 {
+	
     unsigned long long i;
     if (mm_is_complex(matcode))
     {
+    	fprintf(stderr,"[%s] Reading complex matrix...\n",__func__);
         for (i=0; i<nz; i++)
             if (fscanf(f, "%lu %lu %lg %lg", &I[i], &J[i], &val[2*i], &val[2*i+1])
                 != 4) return MM_PREMATURE_EOF;
     }
     else if (mm_is_real(matcode))
     {
-        for (i=0; i<nz; i++)
-        {
-            if (fscanf(f, "%lu %lu %lg\n", &I[i], &J[i], &val[i])
-                != 3) return MM_PREMATURE_EOF;
+    
+    	if(!mm_is_symmetric(matcode)) {
+    		fprintf(stderr,"[%s] Reading NON symmetric real matrix...\n",__func__);
+        	for (i=0; i<nz; i++)
+        	{
+	            if (fscanf(f, "%lu %lu %lg\n", &I[i], &J[i], &val[i])
+                	!= 3) return MM_PREMATURE_EOF;
 
+        	}
+        }
+        else{
+        	fprintf(stderr,"[%s] Reading symmetric real matrix...\n",__func__);
+        	unsigned long long j;
+        	for (i=0; i<M; i++) {
+        		
+        		for(j = 0; j<=i; j++) {
+        			
+				if (fscanf(f, "%lu %lu %lg\n", &I[i*N+j], &J[i*N+j], &val[i*N+j]) != 3) {
+					
+					return MM_PREMATURE_EOF;
+				}
+
+				
+
+				if(i!=j){
+
+					I[j*N+i] = I[i*N+j];
+					J[j*N+i] = J[i*N+j];
+					val[j*N+i] = val[i*N+j];
+					
+				}
+			}
+        	}
         }
     }
 
     else if (mm_is_pattern(matcode))
     {
+    	fprintf(stderr,"[%s] Reading pattern matrix...\n",__func__);
         for (i=0; i<nz; i++)
             if (fscanf(f, "%lu %lu", &I[i], &J[i])
                 != 2) return MM_PREMATURE_EOF;
     }
-    else
-        return MM_UNSUPPORTED_TYPE;
 
+    else {
+		fprintf(stderr,"[%s] Unsupported type\n",__func__);
+		return MM_UNSUPPORTED_TYPE;
+	}
+	
     return 0;
         
 }
