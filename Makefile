@@ -5,6 +5,7 @@ DFLAGS=			-DHAVE_PTHREAD $(WRAP_MALLOC)
 
 PROG=			MM-Suite
 
+MPIDIR= MPI
 SUBDIRS= io operations utils solvers lib/CBLAS
 
 SUBCLEAN = $(addsuffix .clean,$(SUBDIRS))
@@ -37,10 +38,15 @@ subdirs: $(SUBDIRS)
 
 $(SUBDIRS):
 	$(MAKE) -C $@
-	
+
+MPISuite:
+	$(MAKE) -C $(MPIDIR)
+
+cleanMPI:
+	$(MAKE) -C $(MPIDIR) clean
+
 MM-Suite: MM-Suite.o subdirs
 	$(CC) $(CFLAGS) $(DFLAGS) $(AOBJS) MM-Suite.o $(OBJECTS) -o $@  $(LIBS)
-
 
 clean: $(SUBCLEAN)
 	rm $(PROG) *.o
