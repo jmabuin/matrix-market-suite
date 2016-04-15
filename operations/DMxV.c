@@ -79,7 +79,8 @@ int DMxV(int argc, char *argv[]) {
         
         double *result=(double *) malloc(nz_vector * sizeof(double));
         
-	cblas_dgemv(CblasColMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
+	//cblas_dgemv(CblasColMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
+	cblas_dgemv(CblasRowMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
 	
 	if(write2file){
 		writeDenseVector(argv[3], result,M_Vector,N_Vector,nz_vector);

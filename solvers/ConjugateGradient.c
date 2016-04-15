@@ -45,11 +45,16 @@ int ConjugateGradient(int argc, char *argv[]) {
 	unsigned long N_Vector;
 	unsigned long long nz_vector;
 	
+	int write2file = 0;
 	
 	if (argc < 3)
 	{
 		fprintf(stderr, "[%s] Usage: %s [input-matrix-file] [input-vector-file]\n",__func__, argv[0]);
 		return 0;
+	}
+	
+	if(argc == 4){
+		write2file = 1;
 	}
 	
 	//Read matrix
@@ -67,12 +72,19 @@ int ConjugateGradient(int argc, char *argv[]) {
 	
         
         //double *y=(double *) malloc(nz_vector * sizeof(double));
-        
+        fprintf(stderr,"[%s] Solving system using conjugate gradient method\n",__func__);
 	ret_code = ConjugateGradientSolver(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector);
 	
 	if(ret_code){
-		writeDenseVector("stdout", b,M_Vector,N_Vector,nz_vector);
-		//fprintf(stderr, "[%s] Number of iterations %lu\n",__func__,k);
+	
+		if(write2file){
+			//writeDenseVector(argv[3], final_result,M_Vector,N_Vector,nz_vector);
+			writeDenseVector(argv[3], b,M_Vector,N_Vector,nz_vector);
+		}
+		else{
+			writeDenseVector("stdout", b,M_Vector,N_Vector,nz_vector);
+		}
+	
 	}
 	else{
 		fprintf(stderr,"[%s] Error executing ConjugateGradientSolver\n",__func__);
