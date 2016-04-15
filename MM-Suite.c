@@ -10,7 +10,7 @@
 #include "solvers/ConjugateGradient.h"
 
 #ifndef PACKAGE_VERSION
-#define PACKAGE_VERSION "0.0.2"
+#define PACKAGE_VERSION "0.1.0"
 #endif
 
 
