@@ -59,7 +59,7 @@ int DMxV(int argc, char *argv[]) {
 	char			*inputMatrixFile = NULL;
 	char			*inputVectorFile = NULL;
 	
-	while ((option = getopt(argc, argv,"o:i:")) >= 0) {
+	while ((option = getopt(argc, argv,"o:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
