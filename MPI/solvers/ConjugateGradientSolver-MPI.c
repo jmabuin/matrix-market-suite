@@ -22,7 +22,7 @@
 
 #include <mpich/mpi.h>
 
-int ConjugateGradientSolverMPI(unsigned long *I, unsigned long *J, double *A, unsigned long M,unsigned long local_M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector) {
+int ConjugateGradientSolverMPI(unsigned long *I, unsigned long *J, double *A, unsigned long M,unsigned long local_M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector, int numIterations) {
 
 
 	double *Ax=(double *) malloc(nz_vector * sizeof(double));
@@ -67,10 +67,9 @@ int ConjugateGradientSolverMPI(unsigned long *I, unsigned long *J, double *A, un
 	unsigned long k = 0;
 	
 	unsigned long maxIterations = M*2;
-	//unsigned long maxIterations = 10;
-	
-	//double tmp = 0.0;
-	//MM_typecode matcode;
+	if ( numIterations != 0) {
+		maxIterations = numIterations;
+	}
 	
 
 	while(!stop){
