@@ -20,7 +20,7 @@
 #include "../operations/cblas.h"
 #include "ConjugateGradientSolver.h"
 
-int ConjugateGradientSolver(unsigned long *I, unsigned long *J, double *A, unsigned long M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector) {
+int ConjugateGradientSolver(unsigned long *I, unsigned long *J, double *A, unsigned long M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector, int iterationNumber) {
 
 
 	double *Ax=(double *) malloc(nz_vector * sizeof(double));
@@ -59,6 +59,11 @@ int ConjugateGradientSolver(unsigned long *I, unsigned long *J, double *A, unsig
 	unsigned long k = 0;
 	
 	unsigned long maxIterations = M*2;
+	
+	if(iterationNumber != 0 ){
+		maxIterations = iterationNumber;
+	}
+	
 	//unsigned long maxIterations = 10;
 	
 	//double tmp = 0.0;

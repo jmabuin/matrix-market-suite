@@ -19,52 +19,89 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <unistd.h>
 
 #include "ConjugateGradient.h"
 #include "ConjugateGradientSolver.h"
 
-int ConjugateGradient(int argc, char *argv[]) {
-//Options: InputMatrixFile InputVectorFile
+void usageConjugateGradient(){
 
+	fprintf(stderr, "\n");
+	fprintf(stderr, "Usage: MM-Suite ConjugateGradient [options] <input-matrix> <input-vector>\n");
+	fprintf(stderr, "Algorithm options:\n\n");
+	fprintf(stderr, "       -i INT        Iteration number. Default: number of matrix rows * 2\n");
+	fprintf(stderr, "\nInput/output options:\n\n");
+	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
+	fprintf(stderr, "\n");
+
+}
+
+int ConjugateGradient(int argc, char *argv[]) {
+
+	int 			ret_code;
+	int 			option;
 	
-	//int i;
-	int ret_code;
+	unsigned long 		*I;
+	unsigned long 		*J;
+	double 			*A;
 	
-	unsigned long *I;
-	unsigned long *J;
-	double *A;
-	
-	unsigned long M;
-	unsigned long N;
-	unsigned long long nz;
+	unsigned long 		M;
+	unsigned long 		N;
+	unsigned long long 	nz;
 	
 	
-	double *b;
-	unsigned long M_Vector;
-	unsigned long N_Vector;
-	unsigned long long nz_vector;
+	double 			*b;
+	unsigned long 		M_Vector;
+	unsigned long 		N_Vector;
+	unsigned long long 	nz_vector;
 	
-	int write2file = 0;
+	char			*outputFileName = NULL;
+	int			iterationNumber = 0;
 	
-	if (argc < 3)
-	{
-		fprintf(stderr, "[%s] Usage: %s [input-matrix-file] [input-vector-file]\n",__func__, argv[0]);
+	char			*inputMatrixFile = NULL;
+	char			*inputVectorFile = NULL;
+	
+	while ((option = getopt(argc, argv,"o:i:")) >= 0) {
+		switch (option) {
+			case 'o' : 
+				//free(outputFileName);
+				
+				outputFileName = (char *) malloc(sizeof(char)*strlen(optarg)+1);
+				strcpy(outputFileName,optarg);
+				
+				break;
+			case 'i' :
+				iterationNumber = atoi(optarg);
+				break;
+			default: break;
+		}
+	
+	}
+	
+	if ((optind + 2 > argc) || (optind + 3 <= argc)) {
+		usageConjugateGradient();
 		return 0;
 	}
 	
-	if(argc == 4){
-		write2file = 1;
+	if(outputFileName == NULL) {
+		outputFileName = (char *) malloc(sizeof(char)*6);
+		sprintf(outputFileName,"stdout");
 	}
 	
+	inputMatrixFile = (char *)malloc(sizeof(char)*strlen(argv[optind])+1);
+	inputVectorFile = (char *)malloc(sizeof(char)*strlen(argv[optind+1])+1);
+	
+	strcpy(inputMatrixFile,argv[optind]);
+	strcpy(inputVectorFile,argv[optind+1]);
+	
 	//Read matrix
-	if(!readDenseCoordinateMatrix(argv[1],&I,&J,&A,&M,&N,&nz)){
+	if(!readDenseCoordinateMatrix(inputMatrixFile,&I,&J,&A,&M,&N,&nz)){
 		fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 		return 0;
 	}
 	
 	//Read vector
-	if(!readDenseVector(argv[2], &b,&M_Vector,&N_Vector,&nz_vector)){
+	if(!readDenseVector(inputVectorFile, &b,&M_Vector,&N_Vector,&nz_vector)){
 		fprintf(stderr, "[%s] Can not read Vector\n",__func__);
 		return 0;
 	}
@@ -73,17 +110,12 @@ int ConjugateGradient(int argc, char *argv[]) {
         
         //double *y=(double *) malloc(nz_vector * sizeof(double));
         fprintf(stderr,"[%s] Solving system using conjugate gradient method\n",__func__);
-	ret_code = ConjugateGradientSolver(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector);
+	ret_code = ConjugateGradientSolver(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
+	//ret_code = 0;
 	
 	if(ret_code){
 	
-		if(write2file){
-			//writeDenseVector(argv[3], final_result,M_Vector,N_Vector,nz_vector);
-			writeDenseVector(argv[3], b,M_Vector,N_Vector,nz_vector);
-		}
-		else{
-			writeDenseVector("stdout", b,M_Vector,N_Vector,nz_vector);
-		}
+		writeDenseVector(outputFileName, b,M_Vector,N_Vector,nz_vector);
 	
 	}
 	else{
