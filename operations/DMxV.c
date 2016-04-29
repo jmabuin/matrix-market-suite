@@ -19,52 +19,85 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+
 #include "cblas.h"
 
 #include "DMxV.h"
 
+void usageDMxV(){
+
+	fprintf(stderr, "\n");
+	fprintf(stderr, "Usage: MM-Suite DMxV [options] <input-matrix> <input-vector>\n");
+	fprintf(stderr, "\nInput/output options:\n\n");
+	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
+	fprintf(stderr, "\n");
+
+}
 
 int DMxV(int argc, char *argv[]) {
-//Options: InputMatrixFile InputVectorFile
-
 	
-	//int i;
-	int ret_code = 1;
+	int 			ret_code = 1;
+	int 			option;
 	
-	unsigned long *I;
-	unsigned long *J;
-	double *values;
+	unsigned long 		*I;
+	unsigned long 		*J;
+	double 			*values;
 	
-	unsigned long M;
-	unsigned long N;
-	unsigned long long nz;
+	unsigned long 		M;
+	unsigned long 		N;
+	unsigned long long 	nz;
 	
 	
-	double *vectorValues;
-	unsigned long M_Vector;
-	unsigned long N_Vector;
-	unsigned long long nz_vector;
+	double 			*vectorValues;
+	unsigned long 		M_Vector;
+	unsigned long 		N_Vector;
+	unsigned long long 	nz_vector;
 	
-	int write2file = 0;
+	char			*outputFileName = NULL;
 	
-	if (argc < 3)
-	{
-		fprintf(stderr, "[%s] Usage: %s [input-matrix-file] [input-vector-file]\n",__func__, argv[0]);
+	char			*inputMatrixFile = NULL;
+	char			*inputVectorFile = NULL;
+	
+	while ((option = getopt(argc, argv,"o:i:")) >= 0) {
+		switch (option) {
+			case 'o' : 
+				//free(outputFileName);
+				
+				outputFileName = (char *) malloc(sizeof(char)*strlen(optarg)+1);
+				strcpy(outputFileName,optarg);
+				
+				break;
+			
+			default: break;
+		}
+	
+	}
+	
+	if ((optind + 2 > argc) || (optind + 3 <= argc)) {
+		usageDMxV();
 		return 0;
 	}
 	
-	if(argc == 4){
-		write2file = 1;
+	if(outputFileName == NULL) {
+		outputFileName = (char *) malloc(sizeof(char)*6);
+		sprintf(outputFileName,"stdout");
 	}
 	
+	inputMatrixFile = (char *)malloc(sizeof(char)*strlen(argv[optind])+1);
+	inputVectorFile = (char *)malloc(sizeof(char)*strlen(argv[optind+1])+1);
+	
+	strcpy(inputMatrixFile,argv[optind]);
+	strcpy(inputVectorFile,argv[optind+1]);
+	
 	//Read matrix
-	if(!readDenseCoordinateMatrix(argv[1],&I,&J,&values,&M,&N,&nz)){
+	if(!readDenseCoordinateMatrix(inputMatrixFile,&I,&J,&values,&M,&N,&nz)){
 		fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 		return 0;
 	}
 	
 	//Read vector
-	if(!readDenseVector(argv[2], &vectorValues,&M_Vector,&N_Vector,&nz_vector)){
+	if(!readDenseVector(inputVectorFile, &vectorValues,&M_Vector,&N_Vector,&nz_vector)){
 		fprintf(stderr, "[%s] Can not read Vector\n",__func__);
 		return 0;
 	}
@@ -82,12 +115,9 @@ int DMxV(int argc, char *argv[]) {
 	//cblas_dgemv(CblasColMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
 	cblas_dgemv(CblasRowMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
 	
-	if(write2file){
-		writeDenseVector(argv[3], result,M_Vector,N_Vector,nz_vector);
-	}
-	else{
-		writeDenseVector("stdout", result,M_Vector,N_Vector,nz_vector);
-	}
+
+	writeDenseVector(outputFileName, result,M_Vector,N_Vector,nz_vector);
+	
 	
 	return ret_code;
 }
