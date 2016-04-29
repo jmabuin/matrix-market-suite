@@ -20,54 +20,86 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpich/mpi.h>
+#include <unistd.h>
 
 #include "cblas.h"
 
 #include "DMxV-MPI.h"
 
+void usageDMxVMPI(){
+
+	fprintf(stderr, "\n");
+	fprintf(stderr, "Usage: MM-Suite DMxV [options] <input-matrix> <input-vector>\n");
+	fprintf(stderr, "\nInput/output options:\n\n");
+	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
+	fprintf(stderr, "\n");
+
+}
 
 int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
-//Options: InputMatrixFile InputVectorFile
 
+	int 			ret_code = 1;
+	int			option;
 	
-	//int i;
-	int ret_code = 1;
+	unsigned long 		*I;
+	unsigned long 		*J;
+	double 			*values;
 	
-	unsigned long *I;
-	unsigned long *J;
-	double *values;
-	
-	unsigned long M;
-	unsigned long local_M;
-	unsigned long N;
-	unsigned long long nz;
+	unsigned long 		M;
+	unsigned long 		local_M;
+	unsigned long 		N;
+	unsigned long 		long nz;
 	
 	
-	double *vectorValues;
-	unsigned long M_Vector;
-	unsigned long N_Vector;
-	unsigned long long nz_vector;
+	double 			*vectorValues;
+	unsigned long 		M_Vector;
+	unsigned long 		N_Vector;
+	unsigned long long 	nz_vector;
 	
-	int write2file = 0;
+	char			*outputFileName = NULL;
 	
-	if (argc < 3)
-	{
-		fprintf(stderr, "[%s] Usage: %s input-matrix-file input-vector-file [output-file]\n",__func__, argv[0]);
+	char			*inputMatrixFile = NULL;
+	char			*inputVectorFile = NULL;
+	
+	while ((option = getopt(argc, argv,"o:")) >= 0) {
+		switch (option) {
+			case 'o' : 
+				//free(outputFileName);
+				
+				outputFileName = (char *) malloc(sizeof(char)*strlen(optarg)+1);
+				strcpy(outputFileName,optarg);
+				
+				break;
+			
+			default: break;
+		}
+	
+	}
+	
+	if ((optind + 2 > argc) || (optind + 3 <= argc)) {
+		usageDMxVMPI();
 		return 0;
 	}
 	
-	if(argc == 4){
-		write2file = 1;
+	if(outputFileName == NULL) {
+		outputFileName = (char *) malloc(sizeof(char)*6);
+		sprintf(outputFileName,"stdout");
 	}
 	
+	inputMatrixFile = (char *)malloc(sizeof(char)*strlen(argv[optind])+1);
+	inputVectorFile = (char *)malloc(sizeof(char)*strlen(argv[optind+1])+1);
+	
+	strcpy(inputMatrixFile,argv[optind]);
+	strcpy(inputVectorFile,argv[optind+1]);
+	
 	//Read matrix
-	if(!readDenseCoordinateMatrixMPI(argv[1],&I,&J,&values,&M,&local_M,&N,&nz,myid, numProcs)){
+	if(!readDenseCoordinateMatrixMPI(inputMatrixFile,&I,&J,&values,&M,&local_M,&N,&nz,myid, numProcs)){
 		fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 		return 0;
 	}
 
 	//Read vector
-	if(!readDenseVector(argv[2], &vectorValues,&M_Vector,&N_Vector,&nz_vector)){
+	if(!readDenseVector(inputVectorFile, &vectorValues,&M_Vector,&N_Vector,&nz_vector)){
 		fprintf(stderr, "[%s] Can not read Vector\n",__func__);
 		return 0;
 	}
@@ -101,13 +133,9 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 	MPI_Barrier(MPI_COMM_WORLD);
 	
 	if (myid == 0){
-	
-		if(write2file){
-			writeDenseVector(argv[3], final_result,M_Vector,N_Vector,nz_vector);
-		}
-		else{
-			writeDenseVector("stdout", final_result,M_Vector,N_Vector,nz_vector);
-		}
+
+		writeDenseVector(outputFileName, final_result,M_Vector,N_Vector,nz_vector);
+
 	}
 	return ret_code;
 }
