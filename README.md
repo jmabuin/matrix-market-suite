@@ -26,6 +26,7 @@ Available commands are:
 
 ## Input/Output
 * **CreateDenseMatrixSymmetric** - creates a dense symmetric matrix
+* **CreateDenseMatrixSymmetricRowLine** - creates a dense symmetric matrix where each line in the output file is a matrix row
 * **CreateDenseVector** - creates a dense vector
 
 ## Basic operations
