@@ -10,7 +10,7 @@ SUBDIRS= io operations utils solvers lib/CBLAS
 
 SUBCLEAN = $(addsuffix .clean,$(SUBDIRS))
 
-OBJECTS= io/CreateDenseMatrixSymmetric.o io/CreateDenseVector.o \
+OBJECTS= io/CreateDenseMatrixSymmetric.o io/CreateDenseVector.o io/CreateDenseMatrixSymmetricRowLine.o \
 	utils/utils.o utils/mmio.o \
 	operations/DMxV.o operations/VectorOperations.o \
 	solvers/ConjugateGradient.o solvers/ConjugateGradientSolver.o

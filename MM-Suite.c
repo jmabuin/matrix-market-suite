@@ -3,6 +3,7 @@
 #include "utils/utils.h"
 
 #include "io/CreateDenseMatrixSymmetric.h"
+#include "io/CreateDenseMatrixSymmetricRowLine.h"
 #include "io/CreateDenseVector.h"
 
 #include "operations/DMxV.h"
@@ -10,7 +11,7 @@
 #include "solvers/ConjugateGradient.h"
 
 #ifndef PACKAGE_VERSION
-#define PACKAGE_VERSION "0.1.0"
+#define PACKAGE_VERSION "0.2.0"
 #endif
 
 
@@ -23,6 +24,7 @@ static int usage()
 	fprintf(stderr, "Usage:   MM-Suite <command> [options]\n\n");
 	fprintf(stderr, "Input/Output:\n");
 	fprintf(stderr, "Command: CreateDenseMatrixSymmetric         creates a dense symmetric matrix\n");
+	fprintf(stderr, "         CreateDenseMatrixSymmetricRowLine  creates a dense symmetric matrix where each line represents a matrix row\n");
 	fprintf(stderr, "         CreateDenseVector                  creates a dense vector\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Basic operations:\n");
@@ -53,6 +55,7 @@ int main(int argc, char *argv[])
 	if (argc < 2) return usage();
 
 	if (strcmp(argv[1], "CreateDenseMatrixSymmetric") == 0) ret = CreateDenseMatrixSymmetric(argc-1, argv+1);
+	else if (strcmp(argv[1], "CreateDenseMatrixSymmetricRowLine") == 0) ret = CreateDenseMatrixSymmetricRowLine(argc-1, argv+1);
 	else if (strcmp(argv[1], "CreateDenseVector") == 0) 	ret = CreateDenseVector(argc-1, argv+1);
 	else if (strcmp(argv[1], "DMxV") == 0) 			ret = DMxV(argc-1, argv+1);
 	else if (strcmp(argv[1], "ConjugateGradient") == 0)	ret = ConjugateGradient(argc-1, argv+1);

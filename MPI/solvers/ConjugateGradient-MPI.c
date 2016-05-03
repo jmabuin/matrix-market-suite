@@ -62,18 +62,25 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
 	char			*inputMatrixFile = NULL;
 	char			*inputVectorFile = NULL;
 	
-	while ((option = getopt(argc, argv,"o:i:")) >= 0) {
+	int			inputFormatRow = 0;
+	
+	while ((option = getopt(argc, argv,"ro:i:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
 				
 				outputFileName = (char *) malloc(sizeof(char)*strlen(optarg)+1);
 				strcpy(outputFileName,optarg);
-				
 				break;
+				
 			case 'i' :
 				iterationNumber = atoi(optarg);
 				break;
+				
+			case 'r':
+				inputFormatRow = 1;
+				break;
+				
 			default: break;
 		}
 	
@@ -96,9 +103,17 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
 	strcpy(inputVectorFile,argv[optind+1]);
 	
 	//Read matrix
-	if(!readDenseCoordinateMatrixMPI(inputMatrixFile,&I,&J,&A,&M,&local_M,&N,&nz,myid, numProcs)){
-		fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
-		return 0;
+	if(inputFormatRow) {
+		if(!readDenseCoordinateMatrixMPIRowLine(inputMatrixFile,&I,&J,&A,&M,&local_M,&N,&nz,myid, numProcs)){
+			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
+			return 0;
+		}
+	}
+	else{
+		if(!readDenseCoordinateMatrixMPI(inputMatrixFile,&I,&J,&A,&M,&local_M,&N,&nz,myid, numProcs)){
+			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
+			return 0;
+		}
 	}
 	
 	

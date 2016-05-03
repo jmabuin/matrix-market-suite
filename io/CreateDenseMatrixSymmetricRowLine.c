@@ -19,26 +19,27 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "CreateDenseMatrixSymmetric.h"
+#include "CreateDenseMatrixSymmetricRowLine.h"
 
-int CreateDenseMatrixSymmetric(int argc, char *argv[]) {
+int CreateDenseMatrixSymmetricRowLine(int argc, char *argv[]) {
 //Options: numRows numCols fileName seed
 
 	FILE *output;
 	//long nz;   
 	int i, j;
-	MM_typecode outputmatcode;
-	
-	mm_initialize_typecode(&outputmatcode);
-	mm_set_matrix(&outputmatcode);
-	mm_set_coordinate(&outputmatcode);
-	//mm_set_dense(&outputmatcode);
-	mm_set_real(&outputmatcode);
-	mm_set_symmetric(&outputmatcode);
 	
 	unsigned long int numRows = 0;
 	unsigned long int numCols = 0;
 	unsigned int seed = 0;
+
+	MM_typecode outputmatcode;
+	
+	mm_initialize_typecode(&outputmatcode);
+	mm_set_matrix(&outputmatcode);
+	//mm_set_coordinate(&outputmatcode);
+	mm_set_dense(&outputmatcode);
+	mm_set_real(&outputmatcode);
+	mm_set_symmetric(&outputmatcode);
 
 	//double valor = 0.0;
 
@@ -60,28 +61,41 @@ int CreateDenseMatrixSymmetric(int argc, char *argv[]) {
 	
 	unsigned long long int nnz = numRows*numCols;
 	
-	//double *values =  (double *) calloc(nnz,sizeof(double));
+	mm_write_banner(output, outputmatcode);
+	mm_write_mtx_crd_size(output, numRows, numCols, numRows*numCols);
+	
+	double *values =  (double *) calloc(nnz,sizeof(double));
 	double value = 0.0;
 	
 	srand (seed);
-
-	mm_write_banner(output, outputmatcode);
-	mm_write_mtx_crd_size(output, numRows, numCols, numRows*numCols);
-	//ret_code = fprintf(output,"\%\%MatrixMarket matrix coordinate real symmetric\n");
-	
-	unsigned long long int val1 = 0;
-	unsigned long long int val2 = 0;
-	
-
 	
 	for(i = 0;i < numRows; i++){
 	
 		for(j = 0; j<=i; j++){
 
 			value = ((double)rand() / (double)RAND_MAX)/100;
-			fprintf(output, "%d %d %f\n",i+1,j+1,value);
-
+			
+			values[i*numCols+j] = value;
+			
+			if(i!=j){
+				values[j*numCols+i] = value;
+			}
+			
 		}
+
+	}
+	
+	
+	for(i = 0;i < numRows; i++){
+	
+		fprintf(output, "%d:",i);
+	
+		for(j = 0; j<numCols; j++){
+
+			fprintf(output, "%f,",values[i*numCols+j] );
+		}
+
+		fprintf(output,"\n");
 
 	}
 	

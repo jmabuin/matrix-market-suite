@@ -32,6 +32,7 @@ void usageConjugateGradient(){
 	fprintf(stderr, "       -i INT        Iteration number. Default: number of matrix rows * 2\n");
 	fprintf(stderr, "\nInput/output options:\n\n");
 	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
+	fprintf(stderr, "       -r            Input format is row per line. Default: False\n");
 	fprintf(stderr, "\n");
 
 }
@@ -61,7 +62,9 @@ int ConjugateGradient(int argc, char *argv[]) {
 	char			*inputMatrixFile = NULL;
 	char			*inputVectorFile = NULL;
 	
-	while ((option = getopt(argc, argv,"o:i:")) >= 0) {
+	int			inputFormatRow = 0;
+	
+	while ((option = getopt(argc, argv,"ro:i:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -70,9 +73,15 @@ int ConjugateGradient(int argc, char *argv[]) {
 				strcpy(outputFileName,optarg);
 				
 				break;
+			
 			case 'i' :
 				iterationNumber = atoi(optarg);
 				break;
+				
+			case 'r':
+				inputFormatRow = 1;
+				break;
+				
 			default: break;
 		}
 	
@@ -95,10 +104,27 @@ int ConjugateGradient(int argc, char *argv[]) {
 	strcpy(inputVectorFile,argv[optind+1]);
 	
 	//Read matrix
-	if(!readDenseCoordinateMatrix(inputMatrixFile,&I,&J,&A,&M,&N,&nz)){
-		fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
-		return 0;
+	
+	//Read matrix
+	if(inputFormatRow){
+	
+		if(!readDenseCoordinateMatrixRowLine(inputMatrixFile,&I,&J,&A,&M,&N,&nz)){
+			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
+			return 0;
+		}
+		
+		//writeDenseVector("stdout",values,M,N,nz);
+		
+	
 	}
+	else {
+		if(!readDenseCoordinateMatrix(inputMatrixFile,&I,&J,&A,&M,&N,&nz)){
+			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
+			return 0;
+		}
+	}
+	
+	
 	
 	//Read vector
 	if(!readDenseVector(inputVectorFile, &b,&M_Vector,&N_Vector,&nz_vector)){

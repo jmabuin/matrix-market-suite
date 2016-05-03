@@ -31,6 +31,7 @@ void usageDMxV(){
 	fprintf(stderr, "Usage: MM-Suite DMxV [options] <input-matrix> <input-vector>\n");
 	fprintf(stderr, "\nInput/output options:\n\n");
 	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
+	fprintf(stderr, "       -r            Input format is row per line. Default: False\n");
 	fprintf(stderr, "\n");
 
 }
@@ -59,7 +60,10 @@ int DMxV(int argc, char *argv[]) {
 	char			*inputMatrixFile = NULL;
 	char			*inputVectorFile = NULL;
 	
-	while ((option = getopt(argc, argv,"o:")) >= 0) {
+	int			inputFormatRow = 0;
+	
+	
+	while ((option = getopt(argc, argv,"ro:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -67,6 +71,10 @@ int DMxV(int argc, char *argv[]) {
 				outputFileName = (char *) malloc(sizeof(char)*strlen(optarg)+1);
 				strcpy(outputFileName,optarg);
 				
+				break;
+			
+			case 'r':
+				inputFormatRow = 1;
 				break;
 			
 			default: break;
@@ -91,10 +99,22 @@ int DMxV(int argc, char *argv[]) {
 	strcpy(inputVectorFile,argv[optind+1]);
 	
 	//Read matrix
-	if(!readDenseCoordinateMatrix(inputMatrixFile,&I,&J,&values,&M,&N,&nz)){
-		fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
-		return 0;
+	if(inputFormatRow){
+	
+		if(!readDenseCoordinateMatrixRowLine(inputMatrixFile,&I,&J,&values,&M,&N,&nz)){
+			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
+			return 0;
+		}
+	
 	}
+	else {
+		if(!readDenseCoordinateMatrix(inputMatrixFile,&I,&J,&values,&M,&N,&nz)){
+			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
+			return 0;
+		}
+	}
+	
+	
 	
 	//Read vector
 	if(!readDenseVector(inputVectorFile, &vectorValues,&M_Vector,&N_Vector,&nz_vector)){

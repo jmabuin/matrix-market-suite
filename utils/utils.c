@@ -73,12 +73,12 @@ int readDenseCoordinateMatrix(char *fileName,unsigned long **I,unsigned long **J
 		return 0;
 	}
 	
-	/*
-	if(!mm_is_dense(inputmatcode)){
-		fprintf(stderr,"[%s] The matrix is not dense\n",__func__);
+	
+	if(!mm_is_coordinate(inputmatcode)){
+		fprintf(stderr,"[%s] The matrix is not coordinate\n",__func__);
 		return 0;
 	}
-	*/
+	
 	
 	if ((ret_code = mm_read_mtx_crd_size(inputMatrix, M, N, nz)) !=0) {
 		fprintf(stderr,"[%s] Could not read matrix size\n",__func__);
@@ -106,6 +106,130 @@ int readDenseCoordinateMatrix(char *fileName,unsigned long **I,unsigned long **J
 	return 1;
 }
 
+
+int readDenseCoordinateMatrixRowLine(char *fileName,unsigned long **I,unsigned long **J, double **values,unsigned long *M,unsigned long *N, unsigned long long *nz) {
+
+	FILE *inputMatrix;
+	
+	int ret_code;
+	int i,j;
+	
+	char * line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	
+	MM_typecode inputmatcode;
+	
+	if ((inputMatrix = fopen(fileName, "r")) == NULL) {
+		fprintf(stderr,"[%s] Error opening matrix file\n",__func__);
+		return 0;
+	}
+	
+	//mm_read_banner(inputMatrix, &inputmatcode);
+	
+	if (mm_read_banner(inputMatrix, &inputmatcode) != 0){
+		fprintf(stderr,"[%s] Could not read banner in the Matrix file\n",__func__);
+		return 0;
+	}
+	
+	
+	if(!mm_is_dense(inputmatcode)){
+		fprintf(stderr,"[%s] The matrix is not a row per line matrix\n",__func__);
+		return 0;
+	}
+	
+	
+	if ((ret_code = mm_read_mtx_crd_size(inputMatrix, M, N, nz)) !=0) {
+		fprintf(stderr,"[%s] Could not read matrix size\n",__func__);
+		return 0;
+	}
+
+	*I = NULL;
+	*J = NULL;
+	*values=NULL;
+
+	*I = (unsigned long *)  malloc(*nz * sizeof(unsigned long));
+	*J = (unsigned long *)  malloc(*nz * sizeof(unsigned long));
+	*values = (double *)  malloc(*nz * sizeof(double));
+	
+	unsigned int *tmpI = *I;
+	unsigned int *tmpJ = *J;
+	double *tmpValues = *values;
+	
+	//Read rows
+	
+	//for (i = 0; i< numRows, i++){
+	
+	unsigned long currentValue = 0;
+	
+	while ((read = getline(&line, &len, inputMatrix)) != -1) {
+		
+		char* token = strtok(line, ":");
+		char *valuesLine;
+		
+		
+		int currentRow = -1;
+		
+		while(token){
+		
+			if(currentRow == -1){ //Parse row index
+				currentRow = atoi(token);
+				//fprintf(stderr,"[%s] Current row reading: %d\n",__func__,currentRow);
+			}
+			
+			else{ //Get values
+			
+				valuesLine = (char *) malloc(sizeof(char)*strlen(token));
+				strcpy(valuesLine,token);
+				
+				//fprintf(stderr,"[%s] Current string for values: %s\n",__func__,valuesLine);
+				
+			
+			}
+			
+		
+			token = strtok(0, ":");
+		
+		}
+		
+		
+		token = strtok(valuesLine, ",");
+		
+		unsigned long currentCol = 0;
+		
+		
+		while(token){
+
+			
+			if((currentRow < *M) && (currentCol < *N) && (currentValue < *nz)){
+			
+			
+				tmpI[currentValue] = (unsigned int)currentRow;
+				tmpJ[currentValue] = currentCol;
+			
+				tmpValues[currentValue] = atof(token);
+		
+				currentValue++;
+				currentCol++;
+			
+			}
+
+			token = strtok(0, ",");
+
+		}
+		
+		free(valuesLine);
+		
+	}
+	
+	
+
+	fclose(inputMatrix);
+
+	//mm_write_mtx_crd("stdout",*M,*N,*nz,I,J,values,inputmatcode);
+
+	return 1;
+}
 
 
 int readDenseVector(char *fileName, double **values,unsigned long *M,unsigned long *N, unsigned long long *nz) {
