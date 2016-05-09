@@ -24,6 +24,7 @@
 
 int ConjugateGradientSolverMPI(unsigned long *I, unsigned long *J, double *A, unsigned long M,unsigned long local_M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector, int numIterations) {
 
+	//A*x=b
 
 	double *Ax=(double *) malloc(nz_vector * sizeof(double));
         double *Ap=(double *) malloc(nz_vector * sizeof(double));
@@ -42,11 +43,13 @@ int ConjugateGradientSolverMPI(unsigned long *I, unsigned long *J, double *A, un
                  */
 	
 	//r = b-A*x
-	//cblas_dgemv(CblasColMajor, CblasNoTrans, M,N , 1.0, A, N, x, 1, 0.0, Ax, 1);
-	cblas_dgemv(CblasRowMajor, CblasNoTrans, local_M,N , 1.0, A, N, x, 1, 0.0, Ax_partial, 1);
+	//If we take x=0 the init multiplication is avoided and r=b
+	//cblas_dgemv(CblasRowMajor, CblasNoTrans, local_M,N , 1.0, A, N, x, 1, 0.0, Ax_partial, 1);
 	
-	MPI_Allgather (Ax_partial,local_M,MPI_DOUBLE,Ax,local_M,MPI_DOUBLE,MPI_COMM_WORLD);
-	MPI_Barrier(MPI_COMM_WORLD);
+	//MPI_Allgather (Ax_partial,local_M,MPI_DOUBLE,Ax,local_M,MPI_DOUBLE,MPI_COMM_WORLD);
+	//MPI_Barrier(MPI_COMM_WORLD);
+	memcpy(r, b, N*sizeof(double));
+	
 	
 	vector_substract(b,Ax, r,N);
 	

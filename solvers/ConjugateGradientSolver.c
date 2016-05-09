@@ -21,7 +21,8 @@
 #include "ConjugateGradientSolver.h"
 
 int ConjugateGradientSolver(unsigned long *I, unsigned long *J, double *A, unsigned long M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector, int iterationNumber) {
-
+	
+	//A*x=b
 
 	double *Ax=(double *) malloc(nz_vector * sizeof(double));
         double *Ap=(double *) malloc(nz_vector * sizeof(double));
@@ -38,11 +39,13 @@ int ConjugateGradientSolver(unsigned long *I, unsigned long *J, double *A, unsig
                  */
 	
 	//r = b-A*x
-	cblas_dgemv(CblasColMajor, CblasNoTrans, M,N , 1.0, A, N, x, 1, 0.0, Ax, 1);
+	//If we take x=0 the init multiplication is avoided and r=b
+	
+	//cblas_dgemv(CblasColMajor, CblasNoTrans, M,N , 1.0, A, N, x, 1, 0.0, Ax, 1);
+	memcpy(r, b, N*sizeof(double));
 	
 	vector_substract(b,Ax, r,N);
 	
-	//writeDenseVector("stdout", r,M_Vector,N_Vector,nz_vector);
 	
 	//p=r
 
