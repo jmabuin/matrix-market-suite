@@ -35,9 +35,24 @@ Available commands are:
 ## Solvers
 * **ConjugateGradient** - Solves a system by using the conjugate gradient method
 
+# 4. Versions
+## 4.1. MPI version
+This version is a parallel implementation of the methods from **Matrix Market Suite** that allows parallelization. Nowadays, thse methods are:
 
-# 4. Examples
-## 4.1. Create a dense symmetrix matrix
+* **DMxV**
+* **ConjugateGradient**
+
+### 4.1.2. Build MPI version
+To build the parallel MPI version, the user has to enter the MPI directory and run:
+
+	make
+	
+Dependencies for this versions are only [mpich][6]
+
+	sudo aptitude install mpich libmpich-dev
+
+# 5. Examples
+## 5.1. Create a dense symmetrix matrix
 In this example a dense symmetrix matrix of dimensions 10x10 is created.
 
 	./MM-Suite CreateDenseMatrixSymmetric 10 10 Matrix-Example-10x10.mtx 87
@@ -61,7 +76,7 @@ The result is:
 	10 9 0.700352
 	10 10 0.318448
 
-## 4.2. Create a dense vector
+## 5.2. Create a dense vector
 In this example a vector of 10 elements is created.
 
 	./MM-Suite CreateDenseVector 10 Vector-B-10.mtx 55
@@ -87,7 +102,7 @@ The result is:
 	0.127585
 
 
-## 4.3. Solve a system by using the conjugate gradient method
+## 5.3. Solve a system by using the conjugate gradient method
 In this example we will use the matrix and vector created previouslly to solve a system. For that:
 
 	./MM-Suite ConjugateGradient Matrix-Example-10x10.mtx Vector-B-10.mtx
@@ -111,7 +126,7 @@ The result is:
 	-0.0936935
 	-2.45013
 	
-## 4.4. Multiply a dense matrix and a vector.
+## 5.4. Multiply a dense matrix and a vector.
 To check if the result obtained from the conjugate gradient method is correct, we can perform a multiplication with the input matrix and the result obtained in the previous example. The result must be the vector used also in the previous example.
 
 	./MM-Suite DMxV Matrix-Example-10x10.mtx Result-CG.mtx
@@ -142,3 +157,4 @@ Which is the input vector from the conjugate gradient example.
 [3]: http://www.netlib.org/blas/#_cblas
 [4]: https://gcc.gnu.org/
 [5]: https://gcc.gnu.org/fortran/
+[6]: https://www.mpich.org/
