@@ -41,7 +41,6 @@ int ConjugateGradientSolver(unsigned long *I, unsigned long *J, double *A, unsig
 	//r = b-A*x
 	//If we take x=0 the init multiplication is avoided and r=b
 	
-	//cblas_dgemv(CblasColMajor, CblasNoTrans, M,N , 1.0, A, N, x, 1, 0.0, Ax, 1);
 	memcpy(r, b, N*sizeof(double));
 	
 	vector_substract(b,Ax, r,N);
@@ -76,7 +75,6 @@ int ConjugateGradientSolver(unsigned long *I, unsigned long *J, double *A, unsig
 	while(!stop){
 	
 		//Ap=A*p
-		//cblas_dgemv(CblasColMajor, CblasNoTrans, M,N , 1.0, A, N, p, 1, 0.0, Ap, 1);
 		cblas_dgemv(CblasRowMajor, CblasNoTrans, M,N , 1.0, A, N, p, 1, 0.0, Ap, 1);
 
 		//alphaCG=rsold/(p'*Ap)
