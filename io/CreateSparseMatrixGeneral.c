@@ -95,6 +95,9 @@ int CreateSparseMatrixGeneral(int argc, char *argv[]) {
 		fprintf(stderr, "[%s] Too many non-zero elements. More elements required than matrix size\n", __func__);
 		return 0;
 	}
+	else if(numNonzero%numRows != 0) {
+		numNonzero = elementsPerRow * numRows;
+	}
 
 	columns = malloc(elementsPerRow * sizeof(unsigned long));
 	
