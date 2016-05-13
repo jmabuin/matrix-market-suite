@@ -1,5 +1,5 @@
 CC=			gcc
-CFLAGS=			-g -Wall -Wno-unused-function -O2 
+CFLAGS=			-g -Wall -Wno-unused-function -O2 -std=c99
 WRAP_MALLOC=		-DUSE_MALLOC_WRAPPERS
 DFLAGS=			-DHAVE_PTHREAD $(WRAP_MALLOC)
 

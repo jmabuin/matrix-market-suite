@@ -75,7 +75,8 @@ int mm_read_unsymmetric_sparse(const char *fname, unsigned long *M_, unsigned lo
  
     for (i=0; i<nz; i++)
     {
-        fscanf(f, "%lu %lu %lg\n", &I[i], &J[i], &val[i]);
+        if (fscanf(f, "%lu %lu %lg\n", &I[i], &J[i], &val[i]) != 3)
+		return -1;
         I[i]--;  /* adjust from 1-based to 0-based */
         J[i]--;
     }
@@ -542,13 +543,11 @@ char  *mm_typecode_to_str(MM_typecode matcode)
     char buffer[MM_MAX_LINE_LENGTH];
     char *types[4];
 	char *mm_strdup(const char *);
-    int error = 0;
+
 
     /* check for MTX type */
     if (mm_is_matrix(matcode)) 
         types[0] = MM_MTX_STR;
-    else
-        error = 1;
 
     /* check for CRD or ARR matrix */
     if (mm_is_sparse(matcode))
