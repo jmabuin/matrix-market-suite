@@ -152,8 +152,8 @@ int readDenseCoordinateMatrixRowLine(char *fileName,unsigned long **I,unsigned l
 	*J = (unsigned long *)  malloc(*nz * sizeof(unsigned long));
 	*values = (double *)  malloc(*nz * sizeof(double));
 	
-	unsigned int *tmpI = *I;
-	unsigned int *tmpJ = *J;
+	unsigned long *tmpI = *I;
+	unsigned long *tmpJ = *J;
 	double *tmpValues = *values;
 	
 	//Read rows

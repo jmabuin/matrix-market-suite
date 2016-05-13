@@ -93,7 +93,7 @@ int ConjugateGradient(int argc, char *argv[]) {
 	}
 	
 	if(outputFileName == NULL) {
-		outputFileName = (char *) malloc(sizeof(char)*6);
+		outputFileName = (char *) malloc(sizeof(char)*7);
 		sprintf(outputFileName,"stdout");
 	}
 	
