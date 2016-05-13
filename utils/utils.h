@@ -30,7 +30,11 @@ double systemtime();
 double usertime();
 double realtime();
 
-int readDenseCoordinateMatrix(char *fileName,unsigned long **I,unsigned long **J, double **values,unsigned long *M,unsigned long *N, unsigned long long *nz);
-int readDenseCoordinateMatrixRowLine(char *fileName,unsigned long **I,unsigned long **J, double **values,unsigned long *M,unsigned long *N, unsigned long long *nz);
+int readDenseCoordinateMatrix(char *fileName,unsigned long **II,unsigned long **J, double **values,unsigned long *M,unsigned long *N, unsigned long long *nz);
+int readDenseCoordinateMatrixRowLine(char *fileName,unsigned long **II,unsigned long **J, double **values,unsigned long *M,unsigned long *N, unsigned long long *nz);
 int readDenseVector(char *fileName, double **values,unsigned long *M,unsigned long *N, unsigned long long *nz);
 int writeDenseVector(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz);
+int writeDenseCoordinateMatrix(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz);
+int writeDenseCoordinateMatrixRowLine(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz);
+int writeLUCoordinateMatrix(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz, int *ipiv);
+int writeLUCoordinateMatrixRowLine(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz, int *ipiv);

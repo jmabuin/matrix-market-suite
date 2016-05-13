@@ -112,7 +112,7 @@ int readDenseCoordinateMatrixRowLine(char *fileName,unsigned long **I,unsigned l
 	FILE *inputMatrix;
 	
 	int ret_code;
-	int i,j;
+	//int i,j;
 	
 	char * line = NULL;
 	size_t len = 0;
@@ -165,7 +165,7 @@ int readDenseCoordinateMatrixRowLine(char *fileName,unsigned long **I,unsigned l
 	while ((read = getline(&line, &len, inputMatrix)) != -1) {
 		
 		char* token = strtok(line, ":");
-		char *valuesLine;
+		char *valuesLine = NULL;
 		
 		
 		int currentRow = -1;
@@ -323,4 +323,326 @@ int writeDenseVector(char *fileName, double *values,unsigned long M,unsigned lon
 }
 
 
+int writeDenseCoordinateMatrix(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz) {
+
+	FILE *f;
+	unsigned long i = 0;
+	unsigned long j = 0;
+	
+	if(strcmp(fileName,"stdout")==0){
+		f = stdout;
+	}
+	else{
+		if ((f = fopen(fileName, "w")) == NULL){
+			fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
+			return 0;
+		}
+	}
+	
+	MM_typecode outputmatcode;
+	
+	mm_initialize_typecode(&outputmatcode);
+	//mm_set_array(&outputmatcode);
+	mm_set_coordinate(&outputmatcode);
+	mm_set_real(&outputmatcode);
+
+	
+	mm_write_banner(f, outputmatcode);
+	//mm_write_mtx_array_size(f, M, N);
+	mm_write_mtx_crd_size(f, M, N, nz);
+	
+	for(i = 0;i < M; i++){
+
+		for(j = 0; j< N; j++) {
+			fprintf(f, "%lu %lu %lg\n",i+1,j+1,values[i*N+j]);
+		}
+
+		
+	}
+	
+	if(f!=stdout){
+		fclose(f);
+	}
+	
+	return 1;
+}
+
+int writeDenseCoordinateMatrixRowLine(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz) {
+
+	FILE *f;
+	unsigned long i = 0;
+	unsigned long j = 0;
+	
+	if(strcmp(fileName,"stdout")==0){
+		f = stdout;
+	}
+	else{
+		if ((f = fopen(fileName, "w")) == NULL){
+			fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
+			return 0;
+		}
+	}
+	
+	MM_typecode outputmatcode;
+	
+	mm_initialize_typecode(&outputmatcode);
+	mm_set_matrix(&outputmatcode);
+	mm_set_dense(&outputmatcode);
+	//mm_set_coordinate(&outputmatcode);
+	mm_set_real(&outputmatcode);
+
+	
+	mm_write_banner(f, outputmatcode);
+	//mm_write_mtx_array_size(f, M, N);
+	mm_write_mtx_crd_size(f, M, N, nz);
+	
+	for(i = 0;i < M; i++){
+
+		fprintf(f, "%lu:",i);
+
+		for(j = 0; j< N; j++) {
+			fprintf(f, "%lg,",values[i*N+j] );
+		}
+		
+		fprintf(f,"\n");
+		
+	}
+	
+	if(f!=stdout){
+		fclose(f);
+	}
+	
+	return 1;
+}
+
+
+int writeLUCoordinateMatrix(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz, int *ipiv) {
+
+	FILE *fU;
+	FILE *fL;
+	FILE *fP;
+	
+	unsigned long i = 0;
+	unsigned long j = 0;
+	
+	char *fileNameL;
+	char *fileNameU;
+	char *fileNameP;
+	
+	if(strcmp(fileName,"stdout")==0){
+		fL = stdout;
+		fU = stdout;
+		fP = stdout;
+		
+	}
+	else{
+		fileNameL = (char *) malloc(sizeof(char)*strlen(fileName)+2);
+		fileNameU = (char *) malloc(sizeof(char)*strlen(fileName)+2);
+		fileNameP = (char *) malloc(sizeof(char)*strlen(fileName)+2);
+		
+	
+		sprintf(fileNameL,"L-%s",fileName);
+		sprintf(fileNameU,"U-%s",fileName);
+		sprintf(fileNameP,"P-%s",fileName);
+	
+		if ((fL = fopen(fileNameL, "w")) == NULL){
+			fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
+			return 0;
+		}
+		
+		if ((fU = fopen(fileNameU, "w")) == NULL){
+			fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
+			return 0;
+		}
+		
+		if ((fP = fopen(fileNameP, "w")) == NULL){
+			fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
+			return 0;
+		}
+	}
+	
+	MM_typecode outputmatcode;
+	
+	mm_initialize_typecode(&outputmatcode);
+	//mm_set_array(&outputmatcode);
+	mm_set_coordinate(&outputmatcode);
+	mm_set_real(&outputmatcode);
+
+	
+	mm_write_banner(fL, outputmatcode);
+	//mm_write_mtx_array_size(f, M, N);
+	mm_write_mtx_crd_size(fL, M, N, nz);
+	
+	for(i = 0;i < M; i++){
+		
+		for(j = 0; j< N; j++) {
+			
+			
+			if(j==i) {
+				fprintf(fL, "%lu %lu %lg\n",i+1,j+1,1.0);
+			}
+			else if(j<i){
+				fprintf(fL, "%lu %lu %lg\n",i+1,j+1,values[i*N+j]);
+			}
+			else{ //j>i
+				fprintf(fL, "%lu %lu %lg\n",i+1,j+1,0.0);
+			}
+		
+			
+		}
+
+		
+		
+	}
+	
+	mm_write_banner(fU, outputmatcode);
+	//mm_write_mtx_array_size(f, M, N);
+	mm_write_mtx_crd_size(fU, M, N, nz);
+	
+	for(i = 0;i < M; i++){
+
+		for(j = 0; j< N; j++) {
+		
+			if(j>=i) {
+				fprintf(fU, "%lu %lu %lg\n",i+1,j+1,values[i*N+j]);
+			}
+			else{
+				fprintf(fU, "%lu %lu %lg\n",i+1,j+1,0.0);
+			}
+		
+		}
+		
+	}
+	
+	
+	for(i = 0; i< M; i++) {
+	
+		fprintf(fP,"%d\n",ipiv[i]);
+	}
+	
+	if((fU!=stdout) && (fL!=stdout)){
+		fclose(fL);
+		fclose(fU);
+		fclose(fP);
+	}
+	
+	return 1;
+}
+
+
+int writeLUCoordinateMatrixRowLine(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz, int *ipiv) {
+
+	FILE *fU;
+	FILE *fL;
+	FILE *fP;
+	
+	unsigned long i = 0;
+	unsigned long j = 0;
+	
+	char *fileNameL;
+	char *fileNameU;
+	char *fileNameP;
+	
+	if(strcmp(fileName,"stdout")==0){
+		fL = stdout;
+		fU = stdout;
+		fP = stdout;
+	}
+	else{
+		fileNameL = (char *) malloc(sizeof(char)*strlen(fileName)+2);
+		fileNameU = (char *) malloc(sizeof(char)*strlen(fileName)+2);
+		fileNameP = (char *) malloc(sizeof(char)*strlen(fileName)+2);
+		
+	
+		sprintf(fileNameL,"L-%s",fileName);
+		sprintf(fileNameU,"U-%s",fileName);
+		sprintf(fileNameP,"P-%s",fileName);
+	
+		if ((fL = fopen(fileNameL, "w")) == NULL){
+			fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
+			return 0;
+		}
+		
+		if ((fU = fopen(fileNameU, "w")) == NULL){
+			fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
+			return 0;
+		}
+		
+		if ((fP = fopen(fileNameP, "w")) == NULL){
+			fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
+			return 0;
+		}
+	}
+	
+	MM_typecode outputmatcode;
+	
+	mm_initialize_typecode(&outputmatcode);
+	mm_set_matrix(&outputmatcode);
+	mm_set_dense(&outputmatcode);
+	//mm_set_coordinate(&outputmatcode);
+	mm_set_real(&outputmatcode);
+
+	
+	mm_write_banner(fL, outputmatcode);
+	//mm_write_mtx_array_size(f, M, N);
+	mm_write_mtx_crd_size(fL, M, N, nz);
+	
+	for(i = 0;i < M; i++){
+		
+		fprintf(fL, "%lu:",i);
+		
+		for(j = 0; j< N; j++) {
+			
+			
+			if(j==i) {
+				fprintf(fL, "%lg,",1.0);
+			}
+			else if(j<i){
+				fprintf(fL, "%lg,",values[i*N+j]);
+			}
+			else{ //j>i
+				fprintf(fL, "%lg,",0.0);
+			}
+		
+			
+		}
+
+		fprintf(fL, "\n");
+		
+	}
+	
+	mm_write_banner(fU, outputmatcode);
+	//mm_write_mtx_array_size(f, M, N);
+	mm_write_mtx_crd_size(fU, M, N, nz);
+	
+	for(i = 0;i < M; i++){
+
+		fprintf(fU, "%lu:",i);
+
+		for(j = 0; j< N; j++) {
+		
+			if(j>=i) {
+				fprintf(fU, "%lg,",values[i*N+j]);
+			}
+			else{
+				fprintf(fU, "%lg,",0.0);
+			}
+		
+		}
+		fprintf(fU, "\n");
+	}
+	
+	for(i = 0; i< M; i++) {
+	
+		fprintf(fP,"%d\n",ipiv[i]);
+	}
+	
+	if((fU!=stdout) && (fL!=stdout)){
+		fclose(fL);
+		fclose(fU);
+		fclose(fP);
+	}
+	
+	return 1;
+}
 
