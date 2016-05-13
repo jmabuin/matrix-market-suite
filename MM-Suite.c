@@ -6,6 +6,7 @@
 #include "io/CreateDenseMatrixSymmetricRowLine.h"
 #include "io/CreateDenseVector.h"
 #include "io/CreateDenseMatrixGeneral.h"
+#include "io/CreateSparseMatrixGeneral.h"
 #include "io/CreateDenseMatrixGeneralRowLine.h"
 
 #include "operations/DMxV.h"
@@ -31,6 +32,7 @@ static int usage()
 	fprintf(stderr, "         CreateDenseMatrixSymmetricRowLine  creates a dense symmetric matrix where each line represents a matrix row\n");
 	fprintf(stderr, "         CreateDenseVector                  creates a dense vector\n");
 	fprintf(stderr, "         CreateDenseMatrixGeneral           creates a dense general matrix\n");
+	fprintf(stderr, "         CreateSparseMatrixGeneral          creates a sparse general matrix\n");
 	fprintf(stderr, "         CreateDenseMatrixGeneralRowLine    creates a dense general matrix where each line represents a matrix row\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Basic operations:\n");
@@ -70,6 +72,7 @@ int main(int argc, char *argv[])
 	else if (strcmp(argv[1], "LUDecomposition") == 0)			ret = LUDecomposition(argc-1, argv+1);
 	else if (strcmp(argv[1], "DMxDM") == 0)					ret = DMxDM(argc-1, argv+1);
 	else if (strcmp(argv[1], "CreateDenseMatrixGeneral") == 0)		ret = CreateDenseMatrixGeneral(argc-1, argv+1);
+	else if (strcmp(argv[1], "CreateSparseMatrixGeneral") == 0)		ret = CreateSparseMatrixGeneral(argc-1, argv+1);
 	else if (strcmp(argv[1], "CreateDenseMatrixGeneralRowLine") == 0)	ret = CreateDenseMatrixGeneralRowLine(argc-1, argv+1);
 	else {
 		fprintf(stderr, "[%s] unrecognized command '%s'\n",__func__, argv[1]);

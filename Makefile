@@ -12,6 +12,7 @@ SUBCLEAN = $(addsuffix .clean,$(SUBDIRS))
 
 OBJECTS= io/CreateDenseMatrixSymmetric.o io/CreateDenseVector.o io/CreateDenseMatrixSymmetricRowLine.o \
 	io/CreateDenseMatrixGeneral.o io/CreateDenseMatrixGeneralRowLine.o \
+	io/CreateSparseMatrixGeneral.o \
 	utils/utils.o utils/mmio.o utils/LUValues.o \
 	operations/DMxV.o operations/VectorOperations.o operations/LUDecomposition.o operations/DMxDM.o \
 	solvers/ConjugateGradient.o solvers/ConjugateGradientSolver.o solvers/JacobiSolver.o
