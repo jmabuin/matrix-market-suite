@@ -3,7 +3,7 @@ CFLAGS=			-g -Wall -Wno-unused-function -O2
 WRAP_MALLOC=		-DUSE_MALLOC_WRAPPERS
 DFLAGS=			-DHAVE_PTHREAD $(WRAP_MALLOC)
 
-OBJS= utils.o mmio.o
+OBJS= utils.o mmio.o LUValues.o
 
 LIBS =
 INCLUDES =
