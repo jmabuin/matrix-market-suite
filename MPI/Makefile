@@ -6,7 +6,7 @@ DFLAGS=			-DHAVE_PTHREAD $(WRAP_MALLOC)
 
 PROG=			MM-Suite-MPI
 
-SUBDIRS= operations utils solvers ../lib/CBLAS ../utils ../operations
+SUBDIRS= operations utils solvers ../utils ../operations
 
 SUBCLEAN = $(addsuffix .clean,$(SUBDIRS))
 
@@ -16,7 +16,7 @@ OBJECTS= utils/utils-MPI.o ../utils/mmio.o ../utils/utils.o \
 
 CBLAS_DIR = ../lib/CBLAS/lib/
 
-LIBS = -L$(CBLAS_DIR) -lcblas -lm -lblas
+LIBS = -lopenblas -lm
 INCLUDES =
 
 .PHONY: all

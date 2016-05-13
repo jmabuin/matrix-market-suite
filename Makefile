@@ -6,18 +6,19 @@ DFLAGS=			-DHAVE_PTHREAD $(WRAP_MALLOC)
 PROG=			MM-Suite
 
 MPIDIR= MPI
-SUBDIRS= io operations utils solvers lib/CBLAS
+SUBDIRS= io operations utils solvers #lib/CBLAS
 
 SUBCLEAN = $(addsuffix .clean,$(SUBDIRS))
 
 OBJECTS= io/CreateDenseMatrixSymmetric.o io/CreateDenseVector.o io/CreateDenseMatrixSymmetricRowLine.o \
-	utils/utils.o utils/mmio.o \
-	operations/DMxV.o operations/VectorOperations.o \
-	solvers/ConjugateGradient.o solvers/ConjugateGradientSolver.o
+	io/CreateDenseMatrixGeneral.o io/CreateDenseMatrixGeneralRowLine.o \
+	utils/utils.o utils/mmio.o utils/LUValues.o \
+	operations/DMxV.o operations/VectorOperations.o operations/LUDecomposition.o operations/DMxDM.o \
+	solvers/ConjugateGradient.o solvers/ConjugateGradientSolver.o solvers/JacobiSolver.o
 
 CBLAS_DIR = ./lib/CBLAS/lib/
 
-LIBS = -L$(CBLAS_DIR) -lcblas -lm -lblas
+LIBS = -lopenblas -lm -llapacke
 INCLUDES =
 
 .PHONY: all
