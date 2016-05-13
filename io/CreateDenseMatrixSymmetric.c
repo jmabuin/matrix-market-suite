@@ -58,7 +58,7 @@ int CreateDenseMatrixSymmetric(int argc, char *argv[]) {
 	numCols = atoi(argv[2]);
 	seed = atoi(argv[4]);
 	
-	unsigned long long int nnz = numRows*numCols;
+	//unsigned long long int nnz = numRows*numCols;
 	
 	//double *values =  (double *) calloc(nnz,sizeof(double));
 	double value = 0.0;
@@ -69,8 +69,8 @@ int CreateDenseMatrixSymmetric(int argc, char *argv[]) {
 	mm_write_mtx_crd_size(output, numRows, numCols, numRows*numCols);
 	//ret_code = fprintf(output,"\%\%MatrixMarket matrix coordinate real symmetric\n");
 	
-	unsigned long long int val1 = 0;
-	unsigned long long int val2 = 0;
+	//unsigned long long int val1 = 0;
+	//unsigned long long int val2 = 0;
 	
 
 	
