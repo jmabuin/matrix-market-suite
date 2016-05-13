@@ -22,7 +22,7 @@
 #include <mpich/mpi.h>
 #include <unistd.h>
 
-#include "cblas.h"
+#include <cblas.h>
 
 #include "DMxV-MPI.h"
 
