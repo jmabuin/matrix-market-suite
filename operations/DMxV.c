@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "cblas.h"
+#include <cblas.h>
 
 #include "DMxV.h"
 
@@ -135,7 +135,6 @@ int DMxV(int argc, char *argv[]) {
 	//cblas_dgemv(CblasColMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
 	cblas_dgemv(CblasRowMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
 	
-
 	writeDenseVector(outputFileName, result,M_Vector,N_Vector,nz_vector);
 	
 	
