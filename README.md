@@ -5,11 +5,11 @@
 
 # 2. Installation
 ## 2.1 Dependencies
-**Matrix Market Suite** depends on the [blas][2] library. The [cblas][3] library code is included in the tool.
+**Matrix Market Suite** depends on the [openblas][2] and [lapacke][3] libraries.
 
-To install it in Debian:
+To install them Debian:
 
-	sudo aptitude install libblas-dev libblas3
+	sudo aptitude install libopenblas-base libopenblas-dev liblapacke liblapacke-dev
 
 Also, the compilers used to build the tool are [gcc][4] and [gfortran][5].
 
@@ -28,19 +28,25 @@ Available commands are:
 * **CreateDenseMatrixSymmetric** - creates a dense symmetric matrix
 * **CreateDenseMatrixSymmetricRowLine** - creates a dense symmetric matrix where each line in the output file is a matrix row
 * **CreateDenseVector** - creates a dense vector
+* **CreateDenseMatrixGeneral** - creates a dense general matrix
+* **CreateDenseMatrixGeneralRowLine** - creates a dense general matrix where each line represents a matrix row
 
 ## Basic operations
 * **DMxV** - Dense matrix dot vector operation
+* **DMxDM** - Dense matrix dot dense matrix operation
+* **LUDecomposition** - LU factorization of a matrix using partial pivoting
 
 ## Solvers
 * **ConjugateGradient** - Solves a system by using the conjugate gradient method
 
 # 4. Versions
 ## 4.1. MPI version
-This version is a parallel implementation of the methods from **Matrix Market Suite** that allows parallelization. Nowadays, thse methods are:
+This version is a parallel implementation of the methods from **Matrix Market Suite** that allows parallelization. Nowadays, these methods are:
 
 * **DMxV**
 * **ConjugateGradient**
+
+The **DMxDM** is not yet implemented with MPI.
 
 ### 4.1.2. Build MPI version
 To build the parallel MPI version, the user has to enter the MPI directory and run:
@@ -50,6 +56,7 @@ To build the parallel MPI version, the user has to enter the MPI directory and r
 Dependencies for this versions are only [mpich][6]
 
 	sudo aptitude install mpich libmpich-dev
+
 
 # 5. Examples
 ## 5.1. Create a dense symmetrix matrix
@@ -153,8 +160,8 @@ The result is:
 Which is the input vector from the conjugate gradient example.
 
 [1]: http://math.nist.gov/MatrixMarket/
-[2]: http://www.netlib.org/blas/
-[3]: http://www.netlib.org/blas/#_cblas
+[2]: http://www.openblas.net/
+[3]: http://www.netlib.org/lapack/lapacke.html
 [4]: https://gcc.gnu.org/
 [5]: https://gcc.gnu.org/fortran/
 [6]: https://www.mpich.org/
