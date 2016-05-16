@@ -47,3 +47,4 @@ int writeDenseCoordinateMatrix(char *fileName, double *values,unsigned long M,un
 int writeDenseCoordinateMatrixRowLine(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz);
 int writeLUCoordinateMatrix(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz, int *ipiv);
 int writeLUCoordinateMatrixRowLine(char *fileName, double *values,unsigned long M,unsigned long N, unsigned long long nz, int *ipiv);
+int isDiagonallyDominant(double *values, unsigned M, unsigned N, unsigned long nz);

@@ -646,3 +646,40 @@ int writeLUCoordinateMatrixRowLine(char *fileName, double *values,unsigned long 
 	return 1;
 }
 
+//In mathematics, a matrix is said to be diagonally dominant if for every row of the matrix, the magnitude of the diagonal entry in a row is larger than or equal to the sum of the magnitudes of all the other (non-diagonal) entries in that row
+int isDiagonallyDominant(double *values, unsigned M, unsigned N, unsigned long nz){
+
+	double totalRowValue = 0.0;
+	double diagonalItemValue = 0.0;
+	unsigned int i = 0;
+	unsigned int j = 0;
+
+	for(i=0; i< M; i++) {
+	
+		totalRowValue = 0.0;
+		diagonalItemValue = 0.0;
+		
+		for(j = 0; j< N; j++) {
+		
+			if(i == j) {
+			
+				diagonalItemValue = values[i*N+j];
+			
+			}
+			else{
+			
+				totalRowValue = totalRowValue + values[i*N+j];
+			}
+		
+		}
+		
+		if(diagonalItemValue < totalRowValue){
+			return 0;
+		}
+		
+	}
+	
+	return 1;
+
+}
+
