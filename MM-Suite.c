@@ -14,6 +14,7 @@
 #include "operations/DMxDM.h"
 
 #include "solvers/ConjugateGradient.h"
+#include "solvers/Jacobi.h"
 
 #ifndef PACKAGE_VERSION
 #define PACKAGE_VERSION "0.2.0"
@@ -42,6 +43,7 @@ static int usage()
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Solvers:\n");
 	fprintf(stderr, "Command: ConjugateGradient                  Solves a system by using the conjugate gradient method\n");
+	fprintf(stderr, "         Jacobi                             Solves a system by using the Jacobi method\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -74,6 +76,7 @@ int main(int argc, char *argv[])
 	else if (strcmp(argv[1], "CreateDenseMatrixGeneral") == 0)		ret = CreateDenseMatrixGeneral(argc-1, argv+1);
 	else if (strcmp(argv[1], "CreateSparseMatrixGeneral") == 0)		ret = CreateSparseMatrixGeneral(argc-1, argv+1);
 	else if (strcmp(argv[1], "CreateDenseMatrixGeneralRowLine") == 0)	ret = CreateDenseMatrixGeneralRowLine(argc-1, argv+1);
+	else if (strcmp(argv[1], "Jacobi") == 0)				ret = Jacobi(argc-1, argv+1);
 	else {
 		fprintf(stderr, "[%s] unrecognized command '%s'\n",__func__, argv[1]);
 		return 1;
