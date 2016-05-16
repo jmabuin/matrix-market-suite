@@ -22,98 +22,96 @@
 
 int JacobiSolver(unsigned long *I, unsigned long *J, double *A, unsigned long M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector, int iterationNumber) {
 	
-	//A*x=b
-
-	double *Ax=(double *) malloc(nz_vector * sizeof(double));
-        double *Ap=(double *) malloc(nz_vector * sizeof(double));
-        double *r=(double *) malloc(nz_vector * sizeof(double));
-        double *p=(double *) malloc(nz_vector * sizeof(double));
-	double *x=(double *) calloc(nz_vector,sizeof(double));
+	//Jacobi Method as shown in the example from https://en.wikipedia.org/wiki/Jacobi_method
 	
+	unsigned long 	k 	= 0;
+	int 		stop 	= 0;
+	
+	unsigned int	i	= 0;
+	unsigned int	j	= 0;
+	
+	double		alpha	= 0.0;
+	double		result	= 0.0;
+	
+	//Initial solution
+	double *x1=(double *) calloc(nz_vector,sizeof(double));
+	double *x2=(double *) calloc(nz_vector,sizeof(double));
+	
+	double *res=(double *) calloc(nz_vector,sizeof(double));
+	
+	double *LU=(double *) calloc(nz,sizeof(double));
+	double *Dinv=(double *) calloc(nz,sizeof(double));
+	
+	double *T=(double *) calloc(nz,sizeof(double));
+	double *C=(double *) calloc(nz_vector,sizeof(double));
+	
+	
+	if(!isDiagonallyDominant(A,M,N,nz)){
+		fprintf(stderr, "[%s] The matrix is not diagonally dominant\n",__func__);
+		return 0;
+	}
+	
+	getLUValues(LU, A,M,N,nz);
+
+	getDInvValues(Dinv, A,M,N,nz);
+	
+	for(i = 0; i< N; i++){
+		x1[i] = 1.0;
+	}
+	
+	//T=-D^{-1}(L+U)
 	/*
-	void cblas_dgemv(const enum CBLAS_ORDER order,
-                 const enum CBLAS_TRANSPOSE TransA, const int M, const int N,
-                 const double alpha, const double *A, const int lda,
-                 const double *X, const int incX, const double beta,
-                 double *Y, const int incY);
-                 */
+	void cblas_dgemm (const CBLAS_LAYOUT Layout, const CBLAS_TRANSPOSE transa, const CBLAS_TRANSPOSE transb, const MKL_INT m, const MKL_INT n, const MKL_INT k, const double alpha, const double *a, const MKL_INT lda, const double *b, const MKL_INT ldb, const double beta, double *c, const MKL_INT ldc);
+	*/
+	cblas_dgemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, N, -1.0, Dinv, N, LU, N, 0.0, T, N);
+	//writeDenseCoordinateMatrixRowLine("stdout", T,M,N,nz);
 	
-	//r = b-A*x
-	//If we take x=0 the init multiplication is avoided and r=b
+	//C=-D^{-1}B
+	cblas_dgemv(CblasRowMajor, CblasNoTrans, M,N , 1.0, Dinv, N, b, 1, -1.0, C, 1);
 	
-	//cblas_dgemv(CblasColMajor, CblasNoTrans, M,N , 1.0, A, N, x, 1, 0.0, Ax, 1);
-	memcpy(r, b, N*sizeof(double));
-	
-	vector_substract(b,Ax, r,N);
-	
-	
-	//p=r
-
-	memcpy(p, r, N*sizeof(double));
-	
-	//rsold = r*r
-	double rsold = cblas_ddot(N,r,1,r,1);
-	
-	int stop = 0;
-		
-	double alphaCG = 0.0;
-		
-	double rsnew = 0.0;
-	unsigned long k = 0;
-	
+	//writeDenseVector("stdout", C,nz_vector,1, nz_vector);
 	unsigned long maxIterations = M*2;
 	
 	if(iterationNumber != 0 ){
 		maxIterations = iterationNumber;
 	}
 	
-	//unsigned long maxIterations = 10;
+	while(!stop) {
 	
-	//double tmp = 0.0;
-	//MM_typecode matcode;
-	
-
-	while(!stop){
-	
-		//Ap=A*p
-		//cblas_dgemv(CblasColMajor, CblasNoTrans, M,N , 1.0, A, N, p, 1, 0.0, Ap, 1);
-		cblas_dgemv(CblasRowMajor, CblasNoTrans, M,N , 1.0, A, N, p, 1, 0.0, Ap, 1);
-
-		//alphaCG=rsold/(p'*Ap)
-		alphaCG = rsold/cblas_ddot(N,p,1,Ap,1);
+		// x^{(1)}= Tx^{(0)}+C
+		//x2 = T*x1
+		cblas_dgemv(CblasRowMajor, CblasNoTrans, M,N , 1.0, T, N, x1, 1, 0.0, x2, 1);
 		
-		//x=x+alphaCG*p
-		cblas_daxpy(N,alphaCG,p,1,x,1);
-
-		//r=r-alphaCG*Ap
-		cblas_daxpy(N,-alphaCG,Ap,1,r,1);
+		//x2 = x2+C
+		cblas_daxpy(nz_vector,1.0,C, 1, x2, 1);
+		
+		//res = A*x - b
+		memcpy(res, b, nz_vector*sizeof(double));
+		cblas_dgemv(CblasRowMajor, CblasNoTrans, M,N , 1.0, A, N, x2, 1, -1.0, res, 1);
 	
-		//rsnew = r'*r
-		rsnew = cblas_ddot(N,r,1,r,1);
-
-		if((sqrt(rsnew)<=EPSILON)||(k == maxIterations)){
+		
+		result = vectorSumElements(res,N);
+		if((fabs(result)<=EPSILON)||(k == maxIterations)){
+			//fprintf(stderr,"Sum vector res is %lg\n",result);
 			stop = 1;
 		}
-		
-		//p=r+rsnew/rsold*p
-		cblas_dscal(N, rsnew/rsold, p, 1);
-		cblas_daxpy(N,1.0,r,1,p,1);
-		
-		
-		rsold = rsnew;
-		
+	
+		memcpy(x1, x2, nz_vector*sizeof(double));
+		//writeDenseVector("stdout", x1,nz_vector,1, nz_vector);
 		k++;
 	}
 	
-	memcpy(b, x, N*sizeof(double));
+	
 
-	free(Ax);
-        free(Ap);
-        free(r);
-        free(p);
-	free(x);
+	memcpy(b, x2, N*sizeof(double));
+
+	free(x1);
+        free(x2);
+        free(res);
 
 	fprintf(stderr, "[%s] Number of iterations %lu\n",__func__,k);
-
+	
 	return 1;
+	
+	
 }
