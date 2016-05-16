@@ -28,3 +28,21 @@ void vector_substract(double* a,double* b, double* c, unsigned long n) {
 	}
 
 }
+
+//Sum of all elements of a vector
+double vectorSumElements(double *values, unsigned int dim) {
+
+	double result = 0.0;
+	
+	unsigned int i = 0;
+	
+	for (i = 0; i< dim; i++){
+	
+		result = result + values[i];
+	
+	}
+	
+	return result;
+	
+
+}
