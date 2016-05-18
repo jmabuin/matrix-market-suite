@@ -138,7 +138,7 @@ int mm_read_mtx_crd_data_mpi_rowperline(FILE *f, unsigned long M, unsigned long 
 	
 	char * line = NULL;
 	size_t len = 0;
-	ssize_t read;
+	size_t read;
 	
 	if (mm_is_dense(matcode))
 	{
