@@ -110,7 +110,7 @@ int CreateSparseMatrixGeneral(int argc, char *argv[]) {
 	mm_write_mtx_crd_size(output, numRows, numCols, numNonzero);
 
 	for(i = 0;i < numRows; i++){
-		RandomColumns(columns, elementsPerRow, numRows);
+		RandomColumns(columns, elementsPerRow, numCols);
 		for (j = 0; j < elementsPerRow; j++) {
 			value = ((double)rand() / (double)RAND_MAX);
 			fprintf(output, "%lu %lu %lg\n",i+1,columns[j],value);
