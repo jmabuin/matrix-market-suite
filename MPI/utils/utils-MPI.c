@@ -132,13 +132,11 @@ int mm_read_mtx_crd_data_mpi(FILE *f, unsigned long M, unsigned long N, unsigned
 int mm_read_mtx_crd_data_mpi_rowperline(FILE *f, unsigned long M, unsigned long N, unsigned long long nz, unsigned long I[], unsigned long J[], double val[], MM_typecode matcode, unsigned long startRow, unsigned long endRow, unsigned long long totalNz ) {
 	
 	unsigned long long i;
-	unsigned long tmpI;
-	unsigned long tmpJ;
-	double tmpValue;
+	
 	
 	char * line = NULL;
 	size_t len = 0;
-	size_t read;
+	ssize_t read;
 	
 	if (mm_is_dense(matcode))
 	{
@@ -160,7 +158,7 @@ int mm_read_mtx_crd_data_mpi_rowperline(FILE *f, unsigned long M, unsigned long 
 			
 			while ((read = getline(&line, &len, f)) != -1) {
 				char* token = strtok(line, ":");
-				char *valuesLine;
+				char *valuesLine = NULL;
 	
 	
 				int currentRow = -1;
@@ -237,7 +235,7 @@ int readDenseCoordinateMatrixMPI(char *fileName,unsigned long **I,unsigned long 
 	FILE *inputMatrix;
 	
 	int ret_code;
-	unsigned long correspondingRows;
+	
 	unsigned long startRow;
 	unsigned long endRow;
 	unsigned long long totalNz;
@@ -317,7 +315,7 @@ int readDenseCoordinateMatrixMPIRowLine(char *fileName,unsigned long **I,unsigne
 	FILE *inputMatrix;
 	
 	int ret_code;
-	unsigned long correspondingRows;
+	
 	unsigned long startRow;
 	unsigned long endRow;
 	unsigned long long totalNz;

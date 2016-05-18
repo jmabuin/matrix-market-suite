@@ -139,7 +139,7 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 	double* final_result = (double*)calloc(M,sizeof(double));
 	
 	if(final_result == NULL){
-		fprintf("[%s] Error reserving memory for final result vector in processor %d\n",__func__,myid);
+		fprintf(stderr,"[%s] Error reserving memory for final result vector in processor %d\n",__func__,myid);
 		return 0;
 	}
 	

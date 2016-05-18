@@ -31,7 +31,7 @@ int ConjugateGradientSolverMPI(unsigned long *I, unsigned long *J, double *A, un
         double *r=(double *) malloc(nz_vector * sizeof(double));
         double *p=(double *) malloc(nz_vector * sizeof(double));
 	double *x=(double *) calloc(nz_vector,sizeof(double));
-	double *Ax_partial=(double *) malloc(local_M * sizeof(double));
+	
 	double *Ap_partial=(double *) malloc(local_M * sizeof(double));
 	
 	/*
