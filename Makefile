@@ -13,8 +13,6 @@ SOURCES += $(wildcard operations/*.c)
 
 OBJECTS  = $(patsubst %.c,%.o,$(SOURCES))
 
-CBLAS_DIR = ./lib/CBLAS/lib/
-
 LIBS = -lopenblas -lm -llapacke
 INCLUDES =
 
