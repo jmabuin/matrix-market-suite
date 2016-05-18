@@ -1,18 +1,9 @@
-CC=			gcc
-MPICC=			mpicc
-CFLAGS=			-g -Wall -Wno-unused-function -O2 
-WRAP_MALLOC=		-DUSE_MALLOC_WRAPPERS
-DFLAGS=			-DHAVE_PTHREAD $(WRAP_MALLOC)
+include ../Makefile.in
 
-OBJS= DMxV-MPI.o
-
-LIBS =
-INCLUDES =
-
-.c.o:
-	$(MPICC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) $< -o $@
+SOURCES = $(wildcard *.c)
+OBJS = $(patsubst %.c,%.o,$(SOURCES))
 
 all: $(OBJS)
 
 clean:
-	rm *.o
+	rm -f $(OBJS)

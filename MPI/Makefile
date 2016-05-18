@@ -1,22 +1,19 @@
-CC=			gcc
-MPICC=			mpicc
-CFLAGS=			-g -Wall -Wno-unused-function -O2
-WRAP_MALLOC=		-DUSE_MALLOC_WRAPPERS
-DFLAGS=			-DHAVE_PTHREAD $(WRAP_MALLOC)
-
+include Makefile.in
 PROG=			MM-Suite-MPI
 
 SUBDIRS= operations utils solvers ../utils ../operations
 
 SUBCLEAN = $(addsuffix .clean,$(SUBDIRS))
 
-OBJECTS= utils/utils-MPI.o ../utils/mmio.o ../utils/utils.o \
-	operations/DMxV-MPI.o ../operations/VectorOperations.o \
-	solvers/ConjugateGradient-MPI.o solvers/ConjugateGradientSolver-MPI.o
+SOURCES += $(wildcard utils/*.c)
+SOURCES += $(wildcard ../utils/*.c)
+SOURCES += $(wildcard solvers/*.c)
+SOURCES += $(wildcard operations/*.c)
+SOURCES += $(wildcard ../operations/*.c)
 
-CBLAS_DIR = ../lib/CBLAS/lib/
+OBJECTS= $(patsubst %.c,%.o,$(SOURCES))
 
-LIBS = -lopenblas -lm
+LIBS = -lopenblas -lm -llapacke
 INCLUDES =
 
 .PHONY: all
@@ -24,7 +21,7 @@ INCLUDES =
 .SUFFIXES:.c .o .cc
 
 .c.o:
-	$(MPICC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) $< -o $@
+	$(CC) -c $(CFLAGS) $(DFLAGS) $(INCLUDES) $< -o $@
 
 all:$(PROG)
 	
@@ -39,7 +36,7 @@ $(SUBDIRS):
 	$(MAKE) -C $@
 	
 MM-Suite-MPI: MM-Suite-MPI.o subdirs
-	$(MPICC) $(CFLAGS) $(DFLAGS) $(AOBJS) MM-Suite-MPI.o $(OBJECTS) -o $@  $(LIBS)
+	$(CC) $(CFLAGS) $(DFLAGS) $(AOBJS) MM-Suite-MPI.o $(OBJECTS) -o $@  $(LIBS)
 
 clean: $(SUBCLEAN)
 	rm $(PROG) *.o
