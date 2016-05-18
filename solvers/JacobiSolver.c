@@ -28,9 +28,7 @@ int JacobiSolver(unsigned long *I, unsigned long *J, double *A, unsigned long M,
 	int 		stop 	= 0;
 	
 	unsigned int	i	= 0;
-	unsigned int	j	= 0;
 	
-	double		alpha	= 0.0;
 	double		result	= 0.0;
 	
 	//Initial solution
