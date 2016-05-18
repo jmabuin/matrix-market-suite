@@ -20,6 +20,38 @@
 #define PACKAGE_VERSION "0.2.0"
 #endif
 
+typedef enum {TYPECOM, TYPEOP, TYPESOLVER} commandtype;
+
+struct st_command {
+	const char * name;
+	const char * description;
+	commandtype type;
+	int (*function)(int, char*[]);
+};
+
+#define NEW_COMMAND(name, description) {#name, description, TYPECOM, name}
+#define NEW_OPERATION(name, description) {#name, description, TYPEOP, name}
+#define NEW_SOLVER(name, description) {#name, description, TYPESOLVER, name}
+
+const struct st_command commands[] = {
+	NEW_COMMAND(CreateDenseMatrixSymmetric,       "creates a dense symmetric matrix"),
+	NEW_COMMAND(CreateDenseMatrixSymmetricRowLine,"creates a dense symmetric matrix where each line represents a matrix row"),
+	NEW_COMMAND(CreateDenseVector,                "creates a dense vector"),
+	NEW_COMMAND(CreateDenseMatrixGeneral,         "creates a dense general matrix"),
+	NEW_COMMAND(CreateSparseMatrixGeneral,        "creates a sparse general matrix"),
+	NEW_COMMAND(CreateDenseMatrixGeneralRowLine,  "creates a dense general matrix where each line represents a matrix row"),
+	NEW_OPERATION(DMxV,                           "Dense matrix dot vector operation"),
+	NEW_OPERATION(DMxDM,                          "Dense matrix dot dense matrix operation"),
+	NEW_OPERATION(LUDecomposition,                "LU factorization of a matrix"),
+	NEW_SOLVER(ConjugateGradient,                 "Solves a system by using the conjugate gradient method"),
+};
+
+#define SHOW_COMMANDS(mytype) \
+	for (i = 0, imax = sizeof(commands) / sizeof(com); i < imax; i++) { \
+		com = commands[i]; \
+		if (com.type != mytype) continue; \
+		fprintf(stderr, "   %-34s  %s\n", com.name, com.description); \
+	}
 
 static int usage()
 {
@@ -29,21 +61,19 @@ static int usage()
 	fprintf(stderr, "Contact: José M. Abuín <josemanuel.abuin@usc.es>\n\n");
 	fprintf(stderr, "Usage:   MM-Suite <command> [options]\n\n");
 	fprintf(stderr, "Input/Output:\n");
-	fprintf(stderr, "Command: CreateDenseMatrixSymmetric         creates a dense symmetric matrix\n");
-	fprintf(stderr, "         CreateDenseMatrixSymmetricRowLine  creates a dense symmetric matrix where each line represents a matrix row\n");
-	fprintf(stderr, "         CreateDenseVector                  creates a dense vector\n");
-	fprintf(stderr, "         CreateDenseMatrixGeneral           creates a dense general matrix\n");
-	fprintf(stderr, "         CreateSparseMatrixGeneral          creates a sparse general matrix\n");
-	fprintf(stderr, "         CreateDenseMatrixGeneralRowLine    creates a dense general matrix where each line represents a matrix row\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "Basic operations:\n");
-	fprintf(stderr, "Command: DMxV                               Dense matrix dot vector operation\n");
-	fprintf(stderr, "         DMxDM                              Dense matrix dot dense matrix operation\n");
-	fprintf(stderr, "         LUDecomposition                    LU factorization of a matrix\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "Solvers:\n");
-	fprintf(stderr, "Command: ConjugateGradient                  Solves a system by using the conjugate gradient method\n");
-	fprintf(stderr, "         Jacobi                             Solves a system by using the Jacobi method\n");
+
+	size_t i, imax;
+	struct st_command com;
+
+	fprintf(stderr, "Command:\n");
+	SHOW_COMMANDS(TYPECOM);
+
+	fprintf(stderr, "\nBasic operations:\n");
+	SHOW_COMMANDS(TYPEOP);
+
+	fprintf(stderr, "\nSolvers:\n");
+	SHOW_COMMANDS(TYPESOLVER);
+
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -51,38 +81,33 @@ static int usage()
 
 int main(int argc, char *argv[])
 {
-
-	int i, ret;
+	int ret;
 	double t_real;
+	struct st_command com;
+	size_t i, imax;
 
 	t_real = realtime();
 
-	
 	fprintf(stderr, "MM-Suite\tVN:%s\tCL:%s", PACKAGE_VERSION, argv[0]);
 	
-	for (i = 1; i < argc; ++i) fprintf(stderr, " %s", argv[i]);
+	//for (i = 1; i < argc; ++i) fprintf(stderr, " %s", argv[i]);
 	
 	fprintf(stderr, "\n");
 
 	if (argc < 2) return usage();
 
-	if (strcmp(argv[1], "CreateDenseMatrixSymmetric") == 0) 		ret = CreateDenseMatrixSymmetric(argc-1, argv+1);
-	else if (strcmp(argv[1], "CreateDenseMatrixSymmetricRowLine") == 0) 	ret = CreateDenseMatrixSymmetricRowLine(argc-1, argv+1);
-	else if (strcmp(argv[1], "CreateDenseVector") == 0) 			ret = CreateDenseVector(argc-1, argv+1);
-	else if (strcmp(argv[1], "DMxV") == 0) 					ret = DMxV(argc-1, argv+1);
-	else if (strcmp(argv[1], "ConjugateGradient") == 0)			ret = ConjugateGradient(argc-1, argv+1);
-	else if (strcmp(argv[1], "LUDecomposition") == 0)			ret = LUDecomposition(argc-1, argv+1);
-	else if (strcmp(argv[1], "DMxDM") == 0)					ret = DMxDM(argc-1, argv+1);
-	else if (strcmp(argv[1], "CreateDenseMatrixGeneral") == 0)		ret = CreateDenseMatrixGeneral(argc-1, argv+1);
-	else if (strcmp(argv[1], "CreateSparseMatrixGeneral") == 0)		ret = CreateSparseMatrixGeneral(argc-1, argv+1);
-	else if (strcmp(argv[1], "CreateDenseMatrixGeneralRowLine") == 0)	ret = CreateDenseMatrixGeneralRowLine(argc-1, argv+1);
-	else if (strcmp(argv[1], "Jacobi") == 0)				ret = Jacobi(argc-1, argv+1);
-	else {
+	for (i = 0, imax = sizeof(commands) / sizeof(com); i < imax; i++) {
+		com = commands[i];
+		if (strcmp(com.name, argv[1]) == 0) {
+			ret = com.function(argc-1, argv+1);
+			break;
+		}
+	}
+	if (i == imax) {
 		fprintf(stderr, "[%s] unrecognized command '%s'\n",__func__, argv[1]);
 		return 1;
 	}
-	
-	
+
 	if (ret == 0) {
 		fprintf(stderr, "[%s] ERROR!\n", __func__);
 		fprintf(stderr, "[%s] Version: %s\n", __func__, PACKAGE_VERSION);
