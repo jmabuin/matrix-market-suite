@@ -41,7 +41,7 @@ int DMxV(int argc, char *argv[]) {
 	int 			ret_code = 1;
 	int 			option;
 	
-	unsigned long 		*I;
+	unsigned long 		*II;
 	unsigned long 		*J;
 	double 			*values;
 	
@@ -101,14 +101,14 @@ int DMxV(int argc, char *argv[]) {
 	//Read matrix
 	if(inputFormatRow){
 	
-		if(!readDenseCoordinateMatrixRowLine(inputMatrixFile,&I,&J,&values,&M,&N,&nz)){
+		if(!readDenseCoordinateMatrixRowLine(inputMatrixFile,&II,&J,&values,&M,&N,&nz)){
 			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 			return 0;
 		}
 	
 	}
 	else {
-		if(!readDenseCoordinateMatrix(inputMatrixFile,&I,&J,&values,&M,&N,&nz)){
+		if(!readDenseCoordinateMatrix(inputMatrixFile,&II,&J,&values,&M,&N,&nz)){
 			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 			return 0;
 		}
