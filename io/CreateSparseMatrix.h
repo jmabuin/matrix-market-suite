@@ -17,6 +17,5 @@
   * along with Matrix Market Suite. If not, see <http://www.gnu.org/licenses/>.
   */
 
-#include "../utils/mmio.h"
 
-int CreateSparseMatrixGeneral(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned long long nnz, unsigned int seed);
+int CreateSparseMatrix(int argc, char *argv[]);

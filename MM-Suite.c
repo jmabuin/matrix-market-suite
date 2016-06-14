@@ -4,7 +4,7 @@
 
 #include "io/CreateDenseMatrix.h"
 #include "io/CreateDenseVector.h"
-#include "io/CreateSparseMatrixGeneral.h"
+#include "io/CreateSparseMatrix.h"
 
 
 #include "operations/DMxV.h"
@@ -32,9 +32,9 @@ struct st_command {
 #define NEW_SOLVER(name, description) {#name, description, TYPESOLVER, name}
 
 const struct st_command commands[] = {
-	NEW_COMMAND(CreateDenseMatrix,		"creates a dense matrix"),
-	NEW_COMMAND(CreateDenseVector,		"creates a dense vector"),
-	NEW_COMMAND(CreateSparseMatrixGeneral,	"creates a sparse general matrix"),
+	NEW_COMMAND(CreateDenseMatrix,		"Creates a dense matrix"),
+	NEW_COMMAND(CreateDenseVector,		"Creates a dense vector"),
+	NEW_COMMAND(CreateSparseMatrix,		"Creates a sparse matrix"),
 	NEW_OPERATION(DMxV,			"Dense matrix dot vector operation"),
 	NEW_OPERATION(DMxDM,			"Dense matrix dot dense matrix operation"),
 	NEW_OPERATION(LUDecomposition,		"LU factorization of a matrix"),

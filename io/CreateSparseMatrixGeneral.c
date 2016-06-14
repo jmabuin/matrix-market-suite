@@ -20,6 +20,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include "CreateSparseMatrixGeneral.h"
 
 /* Fill the already allocated array (list) with (ammount) **different** random
@@ -47,7 +49,7 @@ static void RandomColumns(unsigned long *list, size_t ammount, unsigned long max
 	}
 };
 
-int CreateSparseMatrixGeneral(int argc, char *argv[]) {
+int CreateSparseMatrixGeneral(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned long long nnz, unsigned int seed) {
 
 	FILE *output;
 	unsigned long int i, j;
@@ -59,27 +61,37 @@ int CreateSparseMatrixGeneral(int argc, char *argv[]) {
 	mm_set_real(&outputmatcode);
 	mm_set_general(&outputmatcode);
 
-	unsigned long int numRows = 0;
-	unsigned long int numCols = 0;
-	unsigned long int numNonzero = 0;
-	unsigned int seed = 0;
+	//unsigned long int numRows = 0;
+	//unsigned long int numCols = 0;
+	unsigned long long int numNonzero = nnz;
+	//unsigned int seed = 0;
 	unsigned long int * columns;
 	size_t elementsPerRow;
 	double value;
 
-	if (argc < 6) {
-		fprintf(stderr, "[%s] Usage: %s [num-rows] [num-cols] [num-nonzero] [output-filename] [seed]\n",__func__, argv[0]);
-		return 0;
-	}
+	//if (argc < 6) {
+	//	fprintf(stderr, "[%s] Usage: %s [num-rows] [num-cols] [num-nonzero] [output-filename] [seed]\n",__func__, argv[0]);
+	//	return 0;
+	//}
 
-	if ((output = fopen(argv[4], "w")) == NULL) {
-		return 0;
-	}
+	//if ((output = fopen(argv[4], "w")) == NULL) {
+	//	return 0;
+	//}
 
-	numRows = atoi(argv[1]);
-	numCols = atoi(argv[2]);
-	numNonzero = atoi(argv[3]);
-	seed = atoi(argv[5]);
+	//numRows = atoi(argv[1]);
+	//numCols = atoi(argv[2]);
+	//numNonzero = atoi(argv[3]);
+	//seed = atoi(argv[5]);
+
+	if(strcmp(fileName,"stdout")==0){
+		output = stdout;
+	}
+	else{
+		if ((output = fopen(fileName, "w")) == NULL){
+			fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
+			return 0;
+		}
+	}
 
 	if (numRows == 0) {
 		fprintf(stderr, "[%s] The number of rows cannot be zero.\n", __func__);
