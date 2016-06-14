@@ -32,17 +32,13 @@ struct st_command {
 #define NEW_SOLVER(name, description) {#name, description, TYPESOLVER, name}
 
 const struct st_command commands[] = {
-	//NEW_COMMAND(CreateDenseMatrixSymmetric,       "creates a dense symmetric matrix"),
-	NEW_COMMAND(CreateDenseMatrix,       "creates a dense matrix"),
-	//NEW_COMMAND(CreateDenseMatrixSymmetricRowLine,"creates a dense symmetric matrix where each line represents a matrix row"),
-	NEW_COMMAND(CreateDenseVector,                "creates a dense vector"),
-	//NEW_COMMAND(CreateDenseMatrixGeneral,         "creates a dense general matrix"),
-	NEW_COMMAND(CreateSparseMatrixGeneral,        "creates a sparse general matrix"),
-	//NEW_COMMAND(CreateDenseMatrixGeneralRowLine,  "creates a dense general matrix where each line represents a matrix row"),
-	NEW_OPERATION(DMxV,                           "Dense matrix dot vector operation"),
-	NEW_OPERATION(DMxDM,                          "Dense matrix dot dense matrix operation"),
-	NEW_OPERATION(LUDecomposition,                "LU factorization of a matrix"),
-	NEW_SOLVER(ConjugateGradient,                 "Solves a system by using the conjugate gradient method"),
+	NEW_COMMAND(CreateDenseMatrix,		"creates a dense matrix"),
+	NEW_COMMAND(CreateDenseVector,		"creates a dense vector"),
+	NEW_COMMAND(CreateSparseMatrixGeneral,	"creates a sparse general matrix"),
+	NEW_OPERATION(DMxV,			"Dense matrix dot vector operation"),
+	NEW_OPERATION(DMxDM,			"Dense matrix dot dense matrix operation"),
+	NEW_OPERATION(LUDecomposition,		"LU factorization of a matrix"),
+	NEW_SOLVER(ConjugateGradient,		"Solves a system by using the conjugate gradient method"),
 };
 
 #define SHOW_COMMANDS(mytype) \
