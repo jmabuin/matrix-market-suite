@@ -19,4 +19,4 @@
 
 #include "../utils/mmio.h"
 
-int CreateDenseMatrixSymmetric(int argc, char *argv[]);
+int CreateDenseMatrixSymmetric(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed);

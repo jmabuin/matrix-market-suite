@@ -17,6 +17,4 @@
   * along with Matrix Market Suite. If not, see <http://www.gnu.org/licenses/>.
   */
 
-#include "../utils/mmio.h"
-
-int CreateDenseMatrixSymmetricRowLine(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed);
+int CreateDenseMatrix(int argc, char *argv[]);

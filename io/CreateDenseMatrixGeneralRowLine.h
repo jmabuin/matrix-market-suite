@@ -19,4 +19,4 @@
 
 #include "../utils/mmio.h"
 
-int CreateDenseMatrixGeneralRowLine(int argc, char *argv[]);
+int CreateDenseMatrixGeneralRowLine(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed);

@@ -2,12 +2,10 @@
 #include <string.h>
 #include "utils/utils.h"
 
-#include "io/CreateDenseMatrixSymmetric.h"
-#include "io/CreateDenseMatrixSymmetricRowLine.h"
+#include "io/CreateDenseMatrix.h"
 #include "io/CreateDenseVector.h"
-#include "io/CreateDenseMatrixGeneral.h"
 #include "io/CreateSparseMatrixGeneral.h"
-#include "io/CreateDenseMatrixGeneralRowLine.h"
+
 
 #include "operations/DMxV.h"
 #include "operations/LUDecomposition.h"
@@ -17,7 +15,7 @@
 #include "solvers/Jacobi.h"
 
 #ifndef PACKAGE_VERSION
-#define PACKAGE_VERSION "0.2.0"
+#define PACKAGE_VERSION "0.3.0"
 #endif
 
 typedef enum {TYPECOM, TYPEOP, TYPESOLVER} commandtype;
@@ -34,12 +32,13 @@ struct st_command {
 #define NEW_SOLVER(name, description) {#name, description, TYPESOLVER, name}
 
 const struct st_command commands[] = {
-	NEW_COMMAND(CreateDenseMatrixSymmetric,       "creates a dense symmetric matrix"),
-	NEW_COMMAND(CreateDenseMatrixSymmetricRowLine,"creates a dense symmetric matrix where each line represents a matrix row"),
+	//NEW_COMMAND(CreateDenseMatrixSymmetric,       "creates a dense symmetric matrix"),
+	NEW_COMMAND(CreateDenseMatrix,       "creates a dense matrix"),
+	//NEW_COMMAND(CreateDenseMatrixSymmetricRowLine,"creates a dense symmetric matrix where each line represents a matrix row"),
 	NEW_COMMAND(CreateDenseVector,                "creates a dense vector"),
-	NEW_COMMAND(CreateDenseMatrixGeneral,         "creates a dense general matrix"),
+	//NEW_COMMAND(CreateDenseMatrixGeneral,         "creates a dense general matrix"),
 	NEW_COMMAND(CreateSparseMatrixGeneral,        "creates a sparse general matrix"),
-	NEW_COMMAND(CreateDenseMatrixGeneralRowLine,  "creates a dense general matrix where each line represents a matrix row"),
+	//NEW_COMMAND(CreateDenseMatrixGeneralRowLine,  "creates a dense general matrix where each line represents a matrix row"),
 	NEW_OPERATION(DMxV,                           "Dense matrix dot vector operation"),
 	NEW_OPERATION(DMxDM,                          "Dense matrix dot dense matrix operation"),
 	NEW_OPERATION(LUDecomposition,                "LU factorization of a matrix"),
@@ -60,12 +59,12 @@ static int usage()
 	fprintf(stderr, "Version: %s\n", PACKAGE_VERSION);
 	fprintf(stderr, "Contact: José M. Abuín <josemanuel.abuin@usc.es>\n\n");
 	fprintf(stderr, "Usage:   MM-Suite <command> [options]\n\n");
-	fprintf(stderr, "Input/Output:\n");
+	fprintf(stderr, "Available commands:\n");
 
 	size_t i, imax;
 	struct st_command com;
 
-	fprintf(stderr, "Command:\n");
+	fprintf(stderr, "Input/Output:\n");
 	SHOW_COMMANDS(TYPECOM);
 
 	fprintf(stderr, "\nBasic operations:\n");

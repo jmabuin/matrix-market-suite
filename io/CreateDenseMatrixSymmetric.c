@@ -19,9 +19,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include "CreateDenseMatrixSymmetric.h"
 
-int CreateDenseMatrixSymmetric(int argc, char *argv[]) {
+int CreateDenseMatrixSymmetric(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed) {
 //Options: numRows numCols fileName seed
 
 	FILE *output;
@@ -36,31 +38,17 @@ int CreateDenseMatrixSymmetric(int argc, char *argv[]) {
 	mm_set_real(&outputmatcode);
 	mm_set_symmetric(&outputmatcode);
 	
-	unsigned long int numRows = 0;
-	unsigned long int numCols = 0;
-	unsigned int seed = 0;
-
-	//double valor = 0.0;
-
-	//int ret_code;
-
-	if (argc < 5)
-	{
-		fprintf(stderr, "[%s] Usage: %s [num-rows] [num-cols] [output-filename] [seed]\n",__func__, argv[0]);
-		return 0;
+	if(strcmp(fileName,"stdout")==0){
+		output = stdout;
 	}
-
-	if ((output = fopen(argv[3], "w")) == NULL){
-		return 0;
+	else{
+		if ((output = fopen(fileName, "w")) == NULL){
+			fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
+			return 0;
+		}
 	}
-			
-	numRows = atoi(argv[1]);
-	numCols = atoi(argv[2]);
-	seed = atoi(argv[4]);
 	
-	//unsigned long long int nnz = numRows*numCols;
-	
-	//double *values =  (double *) calloc(nnz,sizeof(double));
+
 	double value = 0.0;
 	
 	srand (seed);
