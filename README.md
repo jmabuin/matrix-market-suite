@@ -1,7 +1,9 @@
 # Matrix Market Suite
 
 # 1. Description
-**Matrix Market Suite** is a tool that creates and operates over matrices with the [Matrix Market][1] format.
+The [Matrix Market][1] format is a widely used format when working with dense and sparse matrices. Typically, when measuring performance of linear algebra programs or testing scientific simulation software, matrices from collections such as [The University of Florida Sparse Matrix Collection][7] or [The Harwell-Boeing Collection][8]. These collections use the [Matrix Market][1] format as one of their formats.
+
+But sometimes, these matrices are not enough, or don't adapt to certain kind of problems. So, in order to create and test these data, we have created **Matrix Market Suite**. **Matrix Market Suite** is a tool that creates and operates over matrices with the [Matrix Market][1] format.
 
 # 2. Installation
 ## 2.1 Dependencies
@@ -163,3 +165,5 @@ Which is the input vector from the conjugate gradient example.
 [4]: https://gcc.gnu.org/
 [5]: https://gcc.gnu.org/fortran/
 [6]: https://www.mpich.org/
+[7]: https://www.cise.ufl.edu/research/sparse/matrices/
+[8]: http://math.nist.gov/MatrixMarket/data/Harwell-Boeing/
