@@ -41,7 +41,7 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 	int 			ret_code = 1;
 	int			option;
 	
-	unsigned long 		*I;
+	unsigned long 		*II;
 	unsigned long 		*J;
 	double 			*values;
 	
@@ -100,13 +100,13 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 	
 	//Read matrix
 	if(inputFormatRow) {
-		if(!readDenseCoordinateMatrixMPIRowLine(inputMatrixFile,&I,&J,&values,&M,&local_M,&N,&nz,myid, numProcs)){
+		if(!readDenseCoordinateMatrixMPIRowLine(inputMatrixFile,&II,&J,&values,&M,&local_M,&N,&nz,myid, numProcs)){
 			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 			return 0;
 		}
 	}
 	else{
-		if(!readDenseCoordinateMatrixMPI(inputMatrixFile,&I,&J,&values,&M,&local_M,&N,&nz,myid, numProcs)){
+		if(!readDenseCoordinateMatrixMPI(inputMatrixFile,&II,&J,&values,&M,&local_M,&N,&nz,myid, numProcs)){
 			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 			return 0;
 		}

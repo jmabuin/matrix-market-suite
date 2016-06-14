@@ -30,6 +30,6 @@
 #include "../../utils/mmio.h"
 
 
-int readDenseCoordinateMatrixMPI(char *fileName,unsigned long **I,unsigned long **J, double **values,unsigned long *M,unsigned long *local_M,unsigned long *N, unsigned long long *nz, int myid, int numProcs);
-int readDenseCoordinateMatrixMPIRowLine(char *fileName,unsigned long **I,unsigned long **J, double **values,unsigned long *M,unsigned long *local_M,unsigned long *N, unsigned long long *nz, int myid, int numProcs);
+int readDenseCoordinateMatrixMPI(char *fileName,unsigned long **II,unsigned long **J, double **values,unsigned long *M,unsigned long *local_M,unsigned long *N, unsigned long long *nz, int myid, int numProcs);
+int readDenseCoordinateMatrixMPIRowLine(char *fileName,unsigned long **II,unsigned long **J, double **values,unsigned long *M,unsigned long *local_M,unsigned long *N, unsigned long long *nz, int myid, int numProcs);
 
