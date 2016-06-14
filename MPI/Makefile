@@ -13,7 +13,7 @@ SOURCES += $(wildcard ../operations/*.c)
 
 OBJECTS= $(patsubst %.c,%.o,$(SOURCES))
 
-LIBS = -lopenblas -lm -llapacke
+LIBS = -lopenblas -lm
 INCLUDES =
 
 .PHONY: all
