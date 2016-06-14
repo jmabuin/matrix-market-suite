@@ -25,19 +25,16 @@ This command creates the *MM-Suite* executable.
 Available commands are:
 
 ## Input/Output
-* **CreateDenseMatrixSymmetric** - creates a dense symmetric matrix
-* **CreateDenseMatrixSymmetricRowLine** - creates a dense symmetric matrix where each line in the output file is a matrix row
-* **CreateDenseVector** - creates a dense vector
-* **CreateDenseMatrixGeneral** - creates a dense general matrix
-* **CreateDenseMatrixGeneralRowLine** - creates a dense general matrix where each line represents a matrix row
+* **CreateDenseMatrix** - creates a dense matrix. It can be a symmetric or general matrix depending on the arguments.
+* **CreateDenseVector** - creates a dense vector.
 
 ## Basic operations
-* **DMxV** - Dense matrix dot vector operation
-* **DMxDM** - Dense matrix dot dense matrix operation
-* **LUDecomposition** - LU factorization of a matrix using partial pivoting
+* **DMxV** - Dense matrix dot vector operation.
+* **DMxDM** - Dense matrix dot dense matrix operation.
+* **LUDecomposition** - LU factorization of a matrix using partial pivoting.
 
 ## Solvers
-* **ConjugateGradient** - Solves a system by using the conjugate gradient method
+* **ConjugateGradient** - Solves a system by using the conjugate gradient method.
 
 # 4. Versions
 ## 4.1. MPI version
@@ -62,12 +59,13 @@ Dependencies for this versions are only [mpich][6]
 ## 5.1. Create a dense symmetrix matrix
 In this example a dense symmetrix matrix of dimensions 10x10 is created.
 
-	./MM-Suite CreateDenseMatrixSymmetric 10 10 Matrix-Example-10x10.mtx 87
+	./MM-Suite CreateDenseMatrix -o Matrix-Example-10x10.mtx -s 10 10  87
 	
 Where:
+* *-o Matrix-Example-10x10.mtx* Is the option and the file name of the result matrix.
+* *-s Indicates that we want to create a symmetric matrix.
 * *10* Is the number of rows.
 * *10* Is the number of cols.
-* *Matrix-Example-10x10.mtx* Is the file name of the result matrix.
 * *87* Is the seed used to fill the matrix.
 
 The result is:
