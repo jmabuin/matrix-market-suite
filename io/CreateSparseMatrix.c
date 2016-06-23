@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include "CreateSparseMatrix.h"
 #include "CreateSparseMatrixGeneral.h"
+#include "CreateSparseMatrixGeneralGap.h"
 #include "../utils/utils.h"
 
 
@@ -33,6 +34,7 @@ void usageCreateSparseMatrix(){
 	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
 	fprintf(stderr, "       -n INT        Number of non zeros in the output matrix. Default: numRows * numCols\n");
 	fprintf(stderr, "       -s            Output will be a symmetric matrix.  Default: False\n");
+	fprintf(stderr, "       -g            Uses a gap to determine distance to next element.  Default: False\n");
 	fprintf(stderr, "\n");
 
 }
@@ -48,11 +50,12 @@ int CreateSparseMatrix(int argc, char *argv[]) {
 	 */
 
 	int			symmetric	= 0;
+	int 			gapVersion	= 0;
 	char			*outputFileName = NULL;
 	unsigned long long 	nnz 		= 0;
 	int 			option;
 	
-	while ((option = getopt(argc, argv,"so:n:")) >= 0) {
+	while ((option = getopt(argc, argv,"sgo:n:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -68,6 +71,10 @@ int CreateSparseMatrix(int argc, char *argv[]) {
 				
 			case 'n':
 				nnz = atol(optarg);
+				break;
+				
+			case 'g':
+				gapVersion = 1;
 				break;
 				
 			default: break;
@@ -100,8 +107,11 @@ int CreateSparseMatrix(int argc, char *argv[]) {
 		CreateSparseMatrixGeneral(outputFileName, numRows, numCols, seed);
 	}
 */
-	if (!symmetric) { //Case of general matrix and row per line
+	if (!symmetric && !gapVersion) { //Case of general matrix and row per line
 		CreateSparseMatrixGeneral(outputFileName, numRows, numCols, nnz, seed);
+	}
+	else if (!symmetric && gapVersion) {
+		CreateSparseMatrixGeneralGap(outputFileName, numRows, numCols, nnz, seed);
 	}
 
 	return 1;
