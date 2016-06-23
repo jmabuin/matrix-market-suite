@@ -312,7 +312,9 @@ int writeDenseVector(char *fileName, double *values,unsigned long M,unsigned lon
 	
 	for(i = 0;i < M; i++){
 
-		fprintf(f, "%lg\n",values[i]);
+		//fprintf(f, "%lg\n",values[i]);
+		fprintf(f, "%.10f\n",values[i]);
+
 	}
 	
 	if(f!=stdout){
