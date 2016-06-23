@@ -23,6 +23,7 @@
 
 #include "ConjugateGradient.h"
 #include "ConjugateGradientSolver.h"
+#include "ConjugateGradientSolverBasic.h"
 
 void usageConjugateGradient(){
 
@@ -30,6 +31,7 @@ void usageConjugateGradient(){
 	fprintf(stderr, "Usage: MM-Suite ConjugateGradient [options] <input-matrix> <input-vector>\n");
 	fprintf(stderr, "Algorithm options:\n\n");
 	fprintf(stderr, "       -i INT        Iteration number. Default: number of matrix rows * 2\n");
+	fprintf(stderr, "       -b            Uses basic operations instead of optimized BLAS libraries. Default: False\n");
 	fprintf(stderr, "\nInput/output options:\n\n");
 	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
 	fprintf(stderr, "       -r            Input format is row per line. Default: False\n");
@@ -63,8 +65,8 @@ int ConjugateGradient(int argc, char *argv[]) {
 	char			*inputVectorFile = NULL;
 	
 	int			inputFormatRow = 0;
-	
-	while ((option = getopt(argc, argv,"ro:i:")) >= 0) {
+	int			basicOps = 0;
+	while ((option = getopt(argc, argv,"bro:i:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -80,6 +82,9 @@ int ConjugateGradient(int argc, char *argv[]) {
 				
 			case 'r':
 				inputFormatRow = 1;
+				break;
+			case 'b':
+				basicOps = 1;
 				break;
 				
 			default: break;
@@ -136,7 +141,16 @@ int ConjugateGradient(int argc, char *argv[]) {
         
         //double *y=(double *) malloc(nz_vector * sizeof(double));
         fprintf(stderr,"[%s] Solving system using conjugate gradient method\n",__func__);
-	ret_code = ConjugateGradientSolver(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
+        int t_real = realtime();
+
+
+	if(basicOps){
+		ret_code = ConjugateGradientSolverBasic(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
+	}
+	else{
+		ret_code = ConjugateGradientSolver(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
+	}
+	fprintf(stderr, "\n[%s] Time spent in Conjugate Gradient: %.6f sec\n", __func__, realtime() - t_real);
 	//ret_code = 0;
 	
 	if(ret_code){

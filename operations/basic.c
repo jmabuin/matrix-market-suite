@@ -17,10 +17,61 @@
   * along with Matrix Market Suite. If not, see <http://www.gnu.org/licenses/>.
   */
 
-#include <math.h>
+#include "basic.h"
 
-#include "../utils/utils.h"
+void mms_dgemv(int m, int n,double alpha, double *matrix, double *vector,double beta, double *result){
 
-#define EPSILON 1.0e-5       /* Convergence criterion */
+	//double *result = (double *) calloc(m,sizeof(double));
 
-int ConjugateGradientSolver(unsigned long *II, unsigned long *J, double *A, unsigned long M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector, int iterationNumber);
+	int i = 0;
+	int j = 0;
+	for(i=0; i<m; i++){
+		
+		result[i] = 0.0;
+		
+		for(j = 0; j< n; j++){
+		
+			result[i] = result[i] + matrix[i*n+j]*vector[j];
+		}
+	
+	}
+	
+	//return result;
+
+}
+
+void mms_dscal(int m,double value, double *vector){
+
+	int i = 0;
+	
+	for(i = 0; i<m; i++){
+		vector[i] = value*vector[i];
+	}
+}
+
+//val =
+double mms_ddot(int m,double *x, double *y) {
+
+	int i = 0;
+	
+	double result = 0.0;
+	
+	for(i = 0; i<m; i++){
+		result = result + x[i] * y[i];
+	}
+	
+	return result;
+}
+
+//y = alpha*x+y
+void mms_daxpy(int m, double alpha,double *x,double *y) {
+
+	int i = 0;
+	
+	for(i=0; i< m; i++) {
+	
+		y[i] = alpha*x[i] + y [i];
+	}
+	
+
+}

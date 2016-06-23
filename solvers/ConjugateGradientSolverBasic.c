@@ -17,10 +17,10 @@
   * along with Matrix Market Suite. If not, see <http://www.gnu.org/licenses/>.
   */
 
-#include <cblas.h>
-#include "ConjugateGradientSolver.h"
+#include "ConjugateGradientSolverBasic.h"
 
-int ConjugateGradientSolver(unsigned long *II, unsigned long *J, double *A, unsigned long M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector, int iterationNumber) {
+
+int ConjugateGradientSolverBasic(unsigned long *II, unsigned long *J, double *A, unsigned long M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector, int iterationNumber) {
 	
 	//A*x=b
 
@@ -28,18 +28,19 @@ int ConjugateGradientSolver(unsigned long *II, unsigned long *J, double *A, unsi
         double *r=(double *) malloc(nz_vector * sizeof(double));
         double *p=(double *) malloc(nz_vector * sizeof(double));
 	double *x=(double *) calloc(nz_vector,sizeof(double));
-
+	
 	//r = b-A*x
 	//If we take x=0 the init multiplication is avoided and r=b
 	
 	memcpy(r, b, N*sizeof(double));
+	
 	
 	//p=r
 
 	memcpy(p, r, N*sizeof(double));
 	
 	//rsold = r*r
-	double rsold = cblas_ddot(N,r,1,r,1);
+	double rsold = mms_ddot(N,r,r);
 	
 	int stop = 0;
 		
@@ -53,36 +54,32 @@ int ConjugateGradientSolver(unsigned long *II, unsigned long *J, double *A, unsi
 	if(iterationNumber != 0 ){
 		maxIterations = iterationNumber;
 	}
+		
 
-	//int i  = 0;
-	
 	while(!stop){
 	
 		//Ap=A*p
-		// for(i=0; i<M; i++){
-		//	Ap[i] = 0.0;
-		// }
-		cblas_dgemv(CblasColMajor, CblasNoTrans, M,N , 1.0, A, N, p, 1, 0.0, Ap, 1);
+		mms_dgemv( M,N , 1.0, A, p, 0.0, Ap);
 
 		//alphaCG=rsold/(p'*Ap)
-		alphaCG = rsold/cblas_ddot(N,p,1,Ap,1);
+		alphaCG = rsold/mms_ddot(N,p,Ap);
 		
 		//x=x+alphaCG*p
-		cblas_daxpy(N,alphaCG,p,1,x,1);
+		mms_daxpy(N,alphaCG,p,x);
 
 		//r=r-alphaCG*Ap
-		cblas_daxpy(N,-alphaCG,Ap,1,r,1);
+		mms_daxpy(N,-alphaCG,Ap,r);
 	
 		//rsnew = r'*r
-		rsnew = cblas_ddot(N,r,1,r,1);
+		rsnew = mms_ddot(N,r,r);
 
 		if((sqrt(rsnew)<=EPSILON)||(k == maxIterations)){
 			stop = 1;
 		}
 		
 		//p=r+rsnew/rsold*p
-		cblas_dscal(N, rsnew/rsold, p, 1);
-		cblas_daxpy(N,1.0,r,1,p,1);
+		mms_dscal(N, rsnew/rsold, p);
+		mms_daxpy(N,1.0,r,p);
 		
 		
 		rsold = rsnew;

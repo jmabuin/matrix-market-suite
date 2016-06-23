@@ -16,11 +16,8 @@
   * You should have received a copy of the GNU General Public License
   * along with Matrix Market Suite. If not, see <http://www.gnu.org/licenses/>.
   */
-
-#include <math.h>
-
-#include "../utils/utils.h"
-
-#define EPSILON 1.0e-5       /* Convergence criterion */
-
-int ConjugateGradientSolver(unsigned long *II, unsigned long *J, double *A, unsigned long M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector, int iterationNumber);
+  
+void mms_dgemv(int m, int n,double alpha, double *matrix, double *vector,double beta, double *result);
+void mms_dscal(int m,double value, double *vector);
+double mms_ddot(int m,double *x, double *y);
+void mms_daxpy(int m, double alpha,double *x,double *y);

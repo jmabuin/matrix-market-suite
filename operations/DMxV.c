@@ -24,6 +24,7 @@
 #include <cblas.h>
 
 #include "DMxV.h"
+#include "basic.h"
 
 void usageDMxV(){
 
@@ -61,9 +62,9 @@ int DMxV(int argc, char *argv[]) {
 	char			*inputVectorFile = NULL;
 	
 	int			inputFormatRow = 0;
+	int			basicOps = 0;
 	
-	
-	while ((option = getopt(argc, argv,"ro:")) >= 0) {
+	while ((option = getopt(argc, argv,"bro:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -75,6 +76,10 @@ int DMxV(int argc, char *argv[]) {
 			
 			case 'r':
 				inputFormatRow = 1;
+				break;
+				
+			case 'b':
+				basicOps = 1;
 				break;
 			
 			default: break;
@@ -133,7 +138,14 @@ int DMxV(int argc, char *argv[]) {
         double *result=(double *) malloc(nz_vector * sizeof(double));
         
 	//cblas_dgemv(CblasColMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
-	cblas_dgemv(CblasRowMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
+	int t_real = realtime();
+	if(basicOps){
+		mms_dgemv(M, N, 1.0, values, vectorValues,0.0, result);
+	}
+	else{
+		cblas_dgemv(CblasRowMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
+	}
+	fprintf(stderr, "\n[%s] Time spent in cblas_dgemv: %.6f sec\n", __func__, realtime() - t_real);
 	
 	writeDenseVector(outputFileName, result,M_Vector,N_Vector,nz_vector);
 	
