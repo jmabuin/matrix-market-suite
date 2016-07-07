@@ -62,7 +62,7 @@ int ConjugateGradientSolver(unsigned long *II, unsigned long *J, double *A, unsi
 		// for(i=0; i<M; i++){
 		//	Ap[i] = 0.0;
 		// }
-		cblas_dgemv(CblasColMajor, CblasNoTrans, M,N , 1.0, A, N, p, 1, 0.0, Ap, 1);
+		cblas_dgemv(CblasRowMajor, CblasNoTrans, M,N , 1.0, A, N, p, 1, 0.0, Ap, 1);
 
 		//alphaCG=rsold/(p'*Ap)
 		alphaCG = rsold/cblas_ddot(N,p,1,Ap,1);
