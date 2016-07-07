@@ -14,6 +14,7 @@ SOURCES += $(wildcard ../operations/*.c)
 OBJECTS= $(patsubst %.c,%.o,$(SOURCES))
 
 LIBS = -lopenblas -lm
+LIBS_ATLAS = -lcblas -llapacke -lm
 INCLUDES =
 
 .PHONY: all
@@ -37,6 +38,9 @@ $(SUBDIRS):
 	
 MM-Suite-MPI: MM-Suite-MPI.o subdirs
 	$(CC) $(CFLAGS) $(DFLAGS) $(AOBJS) MM-Suite-MPI.o $(OBJECTS) -o $@  $(LIBS)
+
+atlas: MM-Suite-MPI.o subdirs
+	$(CC) $(CFLAGS) $(DFLAGS) $(AOBJS) MM-Suite-MPI.o $(OBJECTS) -o $(PROG)  $(LIBS_ATLAS)
 
 clean: $(SUBCLEAN)
 	rm $(PROG) *.o
