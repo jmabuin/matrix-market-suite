@@ -32,6 +32,7 @@ void usageConjugateGradientMPI(){
 	fprintf(stderr, "       -i INT        Iteration number. Default: number of matrix rows * 2\n");
 	fprintf(stderr, "\nInput/output options:\n\n");
 	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
+	fprintf(stderr, "       -r            Input format is row per line. Default: False\n");
 	fprintf(stderr, "\n");
 
 }
