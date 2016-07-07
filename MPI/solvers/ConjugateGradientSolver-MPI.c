@@ -33,27 +33,11 @@ int ConjugateGradientSolverMPI(unsigned long *II, unsigned long *J, double *A, u
 	double *x=(double *) calloc(nz_vector,sizeof(double));
 	
 	double *Ap_partial=(double *) malloc(local_M * sizeof(double));
-	
-	/*
-	void cblas_dgemv(const enum CBLAS_ORDER order,
-                 const enum CBLAS_TRANSPOSE TransA, const int M, const int N,
-                 const double alpha, const double *A, const int lda,
-                 const double *X, const int incX, const double beta,
-                 double *Y, const int incY);
-                 */
-	
+
 	//r = b-A*x
 	//If we take x=0 the init multiplication is avoided and r=b
-	//cblas_dgemv(CblasRowMajor, CblasNoTrans, local_M,N , 1.0, A, N, x, 1, 0.0, Ax_partial, 1);
-	
-	//MPI_Allgather (Ax_partial,local_M,MPI_DOUBLE,Ax,local_M,MPI_DOUBLE,MPI_COMM_WORLD);
-	//MPI_Barrier(MPI_COMM_WORLD);
+
 	memcpy(r, b, N*sizeof(double));
-	
-	
-	vector_substract(b,Ax, r,N);
-	
-	//writeDenseVector("stdout", r,M_Vector,N_Vector,nz_vector);
 	
 	//p=r
 
