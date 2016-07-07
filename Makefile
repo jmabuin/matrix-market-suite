@@ -13,7 +13,7 @@ SOURCES += $(wildcard operations/*.c)
 
 OBJECTS  = $(patsubst %.c,%.o,$(SOURCES))
 
-LIBS = -lopenblas -llapacke -lm
+LIBS = -lopenblas -lm
 LIBS_ATLAS = -lcblas -llapacke -lm
 INCLUDES =
 
