@@ -33,6 +33,9 @@ void usageDMxVMPI(){
 	fprintf(stderr, "\nInput/output options:\n\n");
 	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
 	fprintf(stderr, "       -r            Input format is row per line. Default: False\n");
+	fprintf(stderr, "\nParameters options:\n\n");
+	fprintf(stderr, "       -a DOUBLE     Alpha. Default: 1.0\n");
+	fprintf(stderr, "       -b DOUBLE     Beta. Default: 0.0\n");
 	fprintf(stderr, "\n");
 
 }
@@ -61,10 +64,16 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 	
 	char			*inputMatrixFile = NULL;
 	char			*inputVectorFile = NULL;
+	char			*outputVectorFile = NULL;
 	
 	int			inputFormatRow = 0;
 	
-	while ((option = getopt(argc, argv,"ro:")) >= 0) {
+	double			alpha = 1.0;
+	double			beta = 0.0;
+	
+	int			i, j;
+	
+	while ((option = getopt(argc, argv,"ro:a:b:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -78,14 +87,31 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 				inputFormatRow = 1;
 				break;
 			
+			case 'b':
+				beta = atof(optarg);
+				break;
+			
+			case 'a':
+				alpha = atof(optarg);
+				break;
+			
 			default: break;
 		}
 	
 	}
 	
-	if ((optind + 2 > argc) || (optind + 3 <= argc)) {
-		usageDMxVMPI();
+	if ((optind + 3 != argc) && (optind + 2 != argc)) {
+		if (myid == 0) {
+			fprintf(stderr,"[%s] Argc: %d, optind: %d\n",__func__, argc, optind);
+			usageDMxVMPI();
+		}
 		return 0;
+	}
+	
+	if(optind + 3 == argc) { //We have an output vector
+	
+		outputVectorFile = (char *)malloc(sizeof(char)*strlen(argv[optind+2])+1);
+		strcpy(outputVectorFile,argv[optind+2]);
 	}
 	
 	if(outputFileName == NULL) {
@@ -96,8 +122,10 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 	inputMatrixFile = (char *)malloc(sizeof(char)*strlen(argv[optind])+1);
 	inputVectorFile = (char *)malloc(sizeof(char)*strlen(argv[optind+1])+1);
 	
+	
 	strcpy(inputMatrixFile,argv[optind]);
 	strcpy(inputVectorFile,argv[optind+1]);
+	
 	
 	//Read matrix
 	if(inputFormatRow) {
@@ -113,13 +141,13 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 		}
 	}
 	
-	//Read vector
+	//Read input vector
 	if(!readDenseVector(inputVectorFile, &vectorValues,&M_Vector,&N_Vector,&nz_vector)){
 		fprintf(stderr, "[%s] Can not read Vector\n",__func__);
 		return 0;
 	}
 
-	
+
 	/*
 	void cblas_dgemv(const enum CBLAS_ORDER order,
                  const enum CBLAS_TRANSPOSE TransA, const int M, const int N,
@@ -129,27 +157,44 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
                  */
         
         double *partial_result=(double *) malloc(local_M * sizeof(double));
-        double* final_result = (double*)calloc(M,sizeof(double));
+        double* y = (double*)calloc(N,sizeof(double));
         
-        int t_real = realtime();
-        
-	//cblas_dgemv(CblasColMajor,CblasNoTrans,local_M,N,1.0,values,N,vectorValues,1,0.0,result,1);
-	cblas_dgemv(CblasRowMajor,CblasNoTrans,local_M,N,1.0,values,N,vectorValues,1,0.0,partial_result,1);
-	
-	
-	if(final_result == NULL){
+        if(y == NULL){
 		fprintf(stderr,"[%s] Error reserving memory for final result vector in processor %d\n",__func__,myid);
 		return 0;
 	}
+        
+        //Read output vector if any
+	if(outputVectorFile != NULL) {
+		if(!readDenseVector(outputVectorFile, &y,&M_Vector,&N_Vector,&nz_vector)){
+			fprintf(stderr, "[%s] Can not read Vector %s\n",__func__, outputVectorFile);
+			return 0;
+		}
+	}
+        
+        for( i = (local_M * myid), j = 0; i< (local_M * myid + local_M) && j< local_M; i++, j++) {
+        	partial_result[j] = y [i];
+        }
+        
+        int t_real = realtime();
+        
+        //y := alpha * A * x + beta * y
 	
-	MPI_Allgather (partial_result,local_M,MPI_DOUBLE,final_result,local_M,MPI_DOUBLE,MPI_COMM_WORLD);
+	//cblas_dgemv(CblasRowMajor,CblasNoTrans,local_M,N,1.0,values,N,vectorValues,1,0.0,partial_result,1);
+	cblas_dgemv(CblasRowMajor,CblasNoTrans,local_M,N,alpha,values,N,vectorValues,1,beta,partial_result,1);
+	
+	
+	
+	
+	MPI_Allgather (partial_result,local_M,MPI_DOUBLE,y,local_M,MPI_DOUBLE,MPI_COMM_WORLD);
 	MPI_Barrier(MPI_COMM_WORLD);
+	
 	
 	fprintf(stderr, "\n[%s] Time spent in DMxV: %.6f sec\n", __func__, realtime() - t_real);
 	
 	if (myid == 0){
 
-		writeDenseVector(outputFileName, final_result,M_Vector,N_Vector,nz_vector);
+		writeDenseVector(outputFileName, y,M_Vector,N_Vector,nz_vector);
 
 	}
 	return ret_code;

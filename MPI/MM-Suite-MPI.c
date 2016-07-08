@@ -11,7 +11,7 @@
 #include "solvers/ConjugateGradient-MPI.h"
 
 #ifndef PACKAGE_VERSION
-#define PACKAGE_VERSION "0.2.0"
+#define PACKAGE_VERSION "0.3.0"
 #endif
 
 
@@ -23,7 +23,7 @@ static int usage()
 	fprintf(stderr, "Contact: José M. Abuín <josemanuel.abuin@usc.es>\n\n");
 	fprintf(stderr, "Usage:   MM-Suite-MPI <command> [options]\n\n");
 	fprintf(stderr, "Basic operations:\n");
-	fprintf(stderr, "Command: DMxV                               Dense matrix dot vector operation\n");
+	fprintf(stderr, "Command: DMxV                               Dense matrix dot vector operation. y = alpha * A * x + beta * y\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Solvers:\n");
 	fprintf(stderr, "Command: ConjugateGradient                  Solves a system by using the conjugate gradient method\n");

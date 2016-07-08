@@ -33,6 +33,9 @@ void usageDMxV(){
 	fprintf(stderr, "\nInput/output options:\n\n");
 	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
 	fprintf(stderr, "       -r            Input format is row per line. Default: False\n");
+	fprintf(stderr, "\nParameters options:\n\n");
+	fprintf(stderr, "       -a DOUBLE     Alpha. Default: 1.0\n");
+	fprintf(stderr, "       -b DOUBLE     Beta. Default: 0.0\n");
 	fprintf(stderr, "\n");
 
 }
@@ -60,11 +63,15 @@ int DMxV(int argc, char *argv[]) {
 	
 	char			*inputMatrixFile = NULL;
 	char			*inputVectorFile = NULL;
+	char			*outputVectorFile = NULL;
 	
 	int			inputFormatRow = 0;
 	int			basicOps = 0;
 	
-	while ((option = getopt(argc, argv,"bro:")) >= 0) {
+	double			alpha = 1.0;
+	double			beta = 0.0;
+	
+	while ((option = getopt(argc, argv,"ero:b:a:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -78,18 +85,32 @@ int DMxV(int argc, char *argv[]) {
 				inputFormatRow = 1;
 				break;
 				
-			case 'b':
+			case 'e':
 				basicOps = 1;
 				break;
+				
+			case 'b':
+				beta = atof(optarg);
+				break;
 			
+			case 'a':
+				alpha = atof(optarg);
+				break;
+				
 			default: break;
 		}
 	
 	}
 	
-	if ((optind + 2 > argc) || (optind + 3 <= argc)) {
+	if ((optind + 3 != argc) && (optind + 2 != argc)) {
 		usageDMxV();
 		return 0;
+	}
+	
+	if(optind + 3 == argc) { //We have an output vector
+	
+		outputVectorFile = (char *)malloc(sizeof(char)*strlen(argv[optind+2])+1);
+		strcpy(outputVectorFile,argv[optind+2]);
 	}
 	
 	if(outputFileName == NULL) {
@@ -137,13 +158,21 @@ int DMxV(int argc, char *argv[]) {
         
         double *result=(double *) malloc(nz_vector * sizeof(double));
         
+        //Read output vector if any
+	if(outputVectorFile != NULL) {
+		if(!readDenseVector(outputVectorFile, &result,&M_Vector,&N_Vector,&nz_vector)){
+			fprintf(stderr, "[%s] Can not read Vector %s\n",__func__, outputVectorFile);
+			return 0;
+		}
+	}
+        
 	//cblas_dgemv(CblasColMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
 	int t_real = realtime();
 	if(basicOps){
-		mms_dgemv(M, N, 1.0, values, vectorValues,0.0, result);
+		mms_dgemv(M, N, alpha, values, vectorValues,beta, result);
 	}
 	else{
-		cblas_dgemv(CblasRowMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
+		cblas_dgemv(CblasRowMajor,CblasNoTrans,M,N,alpha,values,N,vectorValues,1,beta,result,1);
 	}
 	fprintf(stderr, "\n[%s] Time spent in cblas_dgemv: %.6f sec\n", __func__, realtime() - t_real);
 	
