@@ -32,6 +32,7 @@ void usageDMxVMPI(){
 	fprintf(stderr, "Usage: MM-Suite DMxV [options] <input-matrix> <input-vector>\n");
 	fprintf(stderr, "\nInput/output options:\n\n");
 	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
+	fprintf(stderr, "       -r            Input format is row per line. Default: False\n");
 	fprintf(stderr, "\n");
 
 }
@@ -128,15 +129,13 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
                  */
         
         double *partial_result=(double *) malloc(local_M * sizeof(double));
+        double* final_result = (double*)calloc(M,sizeof(double));
         
-        
+        int t_real = realtime();
         
 	//cblas_dgemv(CblasColMajor,CblasNoTrans,local_M,N,1.0,values,N,vectorValues,1,0.0,result,1);
 	cblas_dgemv(CblasRowMajor,CblasNoTrans,local_M,N,1.0,values,N,vectorValues,1,0.0,partial_result,1);
 	
-	
-	
-	double* final_result = (double*)calloc(M,sizeof(double));
 	
 	if(final_result == NULL){
 		fprintf(stderr,"[%s] Error reserving memory for final result vector in processor %d\n",__func__,myid);
@@ -145,6 +144,8 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 	
 	MPI_Allgather (partial_result,local_M,MPI_DOUBLE,final_result,local_M,MPI_DOUBLE,MPI_COMM_WORLD);
 	MPI_Barrier(MPI_COMM_WORLD);
+	
+	fprintf(stderr, "\n[%s] Time spent in DMxV: %.6f sec\n", __func__, realtime() - t_real);
 	
 	if (myid == 0){
 
