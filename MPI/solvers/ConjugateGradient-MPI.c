@@ -129,7 +129,7 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
         //double *y=(double *) malloc(nz_vector * sizeof(double));
         fprintf(stderr,"[%s] Solving system using conjugate gradient method...\n",__func__);
         
-        int t_real = realtime();
+        double t_real = realtime();
         
 	ret_code = ConjugateGradientSolverMPI(I,J,A,M,local_M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
 	

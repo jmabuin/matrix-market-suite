@@ -178,7 +178,7 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
         
         
         
-        int t_real = realtime();
+        double t_real = realtime();
         
         //y := alpha * A * x + beta * y
 	

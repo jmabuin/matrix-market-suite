@@ -141,7 +141,7 @@ int ConjugateGradient(int argc, char *argv[]) {
         
         //double *y=(double *) malloc(nz_vector * sizeof(double));
         fprintf(stderr,"[%s] Solving system using conjugate gradient method\n",__func__);
-        int t_real = realtime();
+        double t_real = realtime();
 
 
 	if(basicOps){

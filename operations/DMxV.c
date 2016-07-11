@@ -167,7 +167,7 @@ int DMxV(int argc, char *argv[]) {
 	}
         
 	//cblas_dgemv(CblasColMajor,CblasNoTrans,M,N,1.0,values,N,vectorValues,1,0.0,result,1);
-	int t_real = realtime();
+	double t_real = realtime();
 	if(basicOps){
 		mms_dgemv(M, N, alpha, values, vectorValues,beta, result);
 	}
