@@ -17,9 +17,19 @@
   * along with Matrix Market Suite. If not, see <http://www.gnu.org/licenses/>.
   */
 
-#include <stdio.h>
-#include <stdlib.h>
+
+#include "../utils/utils.h"
 #include "CreateDenseVector.h"
+
+void usageCreateDenseVector() {
+
+	fprintf(stderr, "\n");
+	fprintf(stderr, "Usage: MM-Suite CreateDenseVector [options] <num-items> <seed>\n");
+	fprintf(stderr, "\nInput/output options:\n\n");
+	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
+	fprintf(stderr, "\n");
+
+}
 
 //int CreateDenseMatrixSymmetric(unsigned long numRows,unsigned long numCols, char *fileName, unsigned int seed) {
 int CreateDenseVector(int argc, char *argv[]) {
@@ -40,23 +50,45 @@ int CreateDenseVector(int argc, char *argv[]) {
 	unsigned long int numItems = 0;
 	unsigned int seed = 0;
 
+	char	*outputFileName = NULL;
+
 	//int ret_code;
 
-	if (argc < 4)
-	{
-		fprintf(stderr, "[%s] Usage: %s [num-items] [output-filename] [seed]\n",__func__, argv[0]);
+	int 	option;
+	
+	while ((option = getopt(argc, argv,"o:")) >= 0) {
+		switch (option) {
+			case 'o' : 
+				//free(outputFileName);
+				
+				outputFileName = (char *) malloc(sizeof(char)*strlen(optarg)+1);
+				strcpy(outputFileName,optarg);
+				
+				break;
+				
+			default: break;
+		}
+	
+	}
+	
+	if (optind + 2 != argc) {
+		usageCreateDenseVector();
 		return 0;
 	}
+	
 
-	if ((output = fopen(argv[2], "w")) == NULL){
-		return 0;
+	if(outputFileName == NULL) {
+		output = stderr;
+		
 	}
-			
-	numItems = atoi(argv[1]);
-	seed = atoi(argv[3]);
+	else {
+		if ((output = fopen(outputFileName, "w")) == NULL){
+			return 0;
+		} 
+	}
 	
-	//unsigned long long int nnz = numItems;
-	
+	numItems = atol(argv[optind]);
+	seed = atoi(argv[optind+1]);
 	
 	srand (seed);
 
