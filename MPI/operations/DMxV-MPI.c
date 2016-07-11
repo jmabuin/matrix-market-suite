@@ -156,7 +156,7 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
                  double *Y, const int incY);
                  */
         
-        double *partial_result=(double *) malloc(local_M * sizeof(double));
+        double *partial_result=(double *) calloc(local_M,sizeof(double));
         double* y = (double*)calloc(N,sizeof(double));
         
         if(y == NULL){
@@ -170,11 +170,13 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 			fprintf(stderr, "[%s] Can not read Vector %s\n",__func__, outputVectorFile);
 			return 0;
 		}
+		
+		for( i = (local_M * myid), j = 0; i< (local_M * myid + local_M) && j< local_M; i++, j++) {
+        		partial_result[j] = y [i];
+        	}
 	}
         
-        for( i = (local_M * myid), j = 0; i< (local_M * myid + local_M) && j< local_M; i++, j++) {
-        	partial_result[j] = y [i];
-        }
+        
         
         int t_real = realtime();
         
