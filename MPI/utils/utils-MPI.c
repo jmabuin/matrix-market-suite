@@ -129,39 +129,35 @@ int mm_read_mtx_crd_data_mpi(FILE *f, unsigned long M, unsigned long N, unsigned
 
 
 
-int mm_read_mtx_crd_data_mpi_rowperline(FILE *f, unsigned long M, unsigned long N, unsigned long long nz, unsigned long I[], unsigned long J[], double val[], MM_typecode matcode, unsigned long startRow, unsigned long endRow, unsigned long long totalNz ) {
+int mm_read_mtx_crd_data_mpi_rowperline(FILE *f, unsigned long M, unsigned long N, unsigned long long nz, unsigned long II[], unsigned long J[], double val[], MM_typecode matcode, unsigned long startRow, unsigned long endRow, unsigned long long totalNz ) {
 	
 	unsigned long long i;
 	
 	
-	char * line = NULL;
-	size_t len = 0;
+	char * line 			= NULL;
+	size_t len 			= 0;
 	ssize_t read;
+	
+	char *token 			= NULL;
+	char *valuesLine 		= NULL;
+	
+	int currentRow 			= -1;
+	unsigned long currentCol 	= 0;
 	
 	if (mm_is_dense(matcode))
 	{
 		
 		fprintf(stderr,"[%s] Reading dense real matrix...\n",__func__);
-		//unsigned long long j;
 		
-		//unsigned long modifier;
-		
-		
-		//if(startRow !=0) {
-		//	modifier = startRow - 1;
-		//}
-		//else{
-		//	modifier = startRow;
-		//}
 		
 		for (i=0; i<M; i++) {
 			
 			while ((read = getline(&line, &len, f)) != -1) {
-				char* token = strtok(line, ":");
-				char *valuesLine = NULL;
+				token = strtok(line, ":");
+				valuesLine = NULL;
 	
 	
-				int currentRow = -1;
+				currentRow = -1;
 	
 				while(token){
 	
@@ -172,7 +168,13 @@ int mm_read_mtx_crd_data_mpi_rowperline(FILE *f, unsigned long M, unsigned long 
 		
 					else{ //Get values
 		
-						valuesLine = (char *) malloc(sizeof(char)*strlen(token));
+						valuesLine = (char *) malloc(sizeof(char)*strlen(token)+1);
+						
+						if (valuesLine == NULL) {
+							fprintf(stderr,"[%s] Error reserving memory with malloc at row %d\n",__func__, currentRow);
+							return -1;
+						}
+						
 						strcpy(valuesLine,token);
 			
 					}
@@ -181,27 +183,26 @@ int mm_read_mtx_crd_data_mpi_rowperline(FILE *f, unsigned long M, unsigned long 
 					token = strtok(0, ":");
 				}
 				
-				
+
+				free(token);
+
 				
 				//If the value is in the same split, the row is the obtained from the file minus the startRow and the col is the same.
-				//In the case of the symmetric value, the values are the same, but we swap row and col.
+
 				if ( (currentRow >= startRow) && (currentRow <= endRow) ) {
 					
 					//Parse values
-						
+					//fprintf(stderr,"[%s][%lu] Reading row %d\n",__func__, startRow, currentRow);
 					token = strtok(valuesLine, ",");	
 					
-					unsigned long currentCol = 0;
+					currentCol = 0;
 					
 		
 					while(token){
 
-						
-			
-			
 						if(currentCol < N){
 
-							I[(currentRow-startRow)*N+currentCol] = currentRow-startRow;
+							II[(currentRow-startRow)*N+currentCol] = currentRow-startRow;
 							J[(currentRow-startRow)*N+currentCol] = currentCol;
 							val[(currentRow-startRow)*N+currentCol] = atof(token);
 		
@@ -212,9 +213,17 @@ int mm_read_mtx_crd_data_mpi_rowperline(FILE *f, unsigned long M, unsigned long 
 						token = strtok(0, ",");
 					}
 
+
 				}
 				
+
+				
 				free(valuesLine);
+			
+				free(token);
+
+				//free(valuesLine);
+				//free(token);
 			}
 				
 		}
@@ -230,7 +239,7 @@ int mm_read_mtx_crd_data_mpi_rowperline(FILE *f, unsigned long M, unsigned long 
  *
  */
  
-int readDenseCoordinateMatrixMPI(char *fileName,unsigned long **I,unsigned long **J, double **values,unsigned long *M,unsigned long *local_M,unsigned long *N, unsigned long long *nz, int myid, int numProcs) {
+int readDenseCoordinateMatrixMPI(char *fileName,unsigned long **II,unsigned long **J, double **values,unsigned long *M,unsigned long *local_M,unsigned long *N, unsigned long long *nz, int myid, int numProcs) {
 
 	FILE *inputMatrix;
 	
@@ -285,15 +294,15 @@ int readDenseCoordinateMatrixMPI(char *fileName,unsigned long **I,unsigned long 
 		*nz = *nz - startRow * (*N);
 	}
 
-	*I = NULL;
+	*II = NULL;
 	*J = NULL;
 	*values=NULL;
 
-	*I = (unsigned long *)  malloc(*nz * sizeof(unsigned long));
+	*II = (unsigned long *)  malloc(*nz * sizeof(unsigned long));
 	*J = (unsigned long *)  malloc(*nz * sizeof(unsigned long));
 	*values = (double *)  malloc(*nz * sizeof(double));
 	
-	if(mm_read_mtx_crd_data_mpi(inputMatrix,*M,*N,*nz,*I,*J,*values,inputmatcode,startRow, endRow, totalNz) != 0){
+	if(mm_read_mtx_crd_data_mpi(inputMatrix,*M,*N,*nz,*II,*J,*values,inputmatcode,startRow, endRow, totalNz) != 0){
 		fprintf(stderr,"[%s] Error reading matrix values\n",__func__);
 		return 0;
 	}
@@ -310,7 +319,7 @@ int readDenseCoordinateMatrixMPI(char *fileName,unsigned long **I,unsigned long 
 }
 
 
-int readDenseCoordinateMatrixMPIRowLine(char *fileName,unsigned long **I,unsigned long **J, double **values,unsigned long *M,unsigned long *local_M,unsigned long *N, unsigned long long *nz, int myid, int numProcs) {
+int readDenseCoordinateMatrixMPIRowLine(char *fileName,unsigned long **II,unsigned long **J, double **values,unsigned long *M,unsigned long *local_M,unsigned long *N, unsigned long long *nz, int myid, int numProcs) {
 
 	FILE *inputMatrix;
 	
@@ -365,15 +374,15 @@ int readDenseCoordinateMatrixMPIRowLine(char *fileName,unsigned long **I,unsigne
 		*nz = *nz - startRow * (*N);
 	}
 
-	*I = NULL;
+	*II = NULL;
 	*J = NULL;
 	*values=NULL;
 
-	*I = (unsigned long *)  malloc(*nz * sizeof(unsigned long));
+	*II = (unsigned long *)  malloc(*nz * sizeof(unsigned long));
 	*J = (unsigned long *)  malloc(*nz * sizeof(unsigned long));
 	*values = (double *)  malloc(*nz * sizeof(double));
 	
-	if(mm_read_mtx_crd_data_mpi_rowperline(inputMatrix,*M,*N,*nz,*I,*J,*values,inputmatcode,startRow, endRow, totalNz) != 0){
+	if(mm_read_mtx_crd_data_mpi_rowperline(inputMatrix,*M,*N,*nz,*II,*J,*values,inputmatcode,startRow, endRow, totalNz) != 0){
 		fprintf(stderr,"[%s] Error reading matrix values\n",__func__);
 		return 0;
 	}

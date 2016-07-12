@@ -102,7 +102,7 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 	
 	if ((optind + 3 != argc) && (optind + 2 != argc)) {
 		if (myid == 0) {
-			fprintf(stderr,"[%s] Argc: %d, optind: %d\n",__func__, argc, optind);
+			//fprintf(stderr,"[%s] Argc: %d, optind: %d\n",__func__, argc, optind);
 			usageDMxVMPI();
 		}
 		return 0;
