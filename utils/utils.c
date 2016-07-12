@@ -164,7 +164,7 @@ int readDenseCoordinateMatrixRowLine(char *fileName,unsigned long **I,unsigned l
 	
 	while ((read = getline(&line, &len, inputMatrix)) != -1) {
 		
-		char* token = strtok(line, ":");
+		char *token = strtok(line, ":");
 		char *valuesLine = NULL;
 		
 		
@@ -173,18 +173,17 @@ int readDenseCoordinateMatrixRowLine(char *fileName,unsigned long **I,unsigned l
 		while(token){
 		
 			if(currentRow == -1){ //Parse row index
+			
 				currentRow = atoi(token);
-				//fprintf(stderr,"[%s] Current row reading: %d\n",__func__,currentRow);
+
 			}
 			
 			else{ //Get values
-			
-				valuesLine = (char *) malloc(sizeof(char)*strlen(token));
+				
+				valuesLine = (char *) malloc(sizeof(char)*strlen(token)+1);
+				
 				strcpy(valuesLine,token);
-				
-				//fprintf(stderr,"[%s] Current string for values: %s\n",__func__,valuesLine);
-				
-			
+	
 			}
 			
 		
@@ -442,6 +441,12 @@ int writeLUCoordinateMatrix(char *fileName, double *values,unsigned long M,unsig
 		fileNameU = (char *) malloc(sizeof(char)*strlen(fileName)+2);
 		fileNameP = (char *) malloc(sizeof(char)*strlen(fileName)+2);
 		
+		
+		if((fileNameL == NULL) || (fileNameU == NULL) || (fileNameP == NULL)) {
+			fprintf(stderr,"[%s] Error reserving memory for file names\n",__func__);
+			return 0;
+		
+		}
 	
 		sprintf(fileNameL,"L-%s",fileName);
 		sprintf(fileNameU,"U-%s",fileName);
@@ -528,6 +533,12 @@ int writeLUCoordinateMatrix(char *fileName, double *values,unsigned long M,unsig
 		fclose(fP);
 	}
 	
+	if((fileNameL == NULL) && (fileNameU == NULL) && (fileNameP == NULL)) {
+		free(fileNameL);
+		free(fileNameU);
+		free(fileNameP);
+	}
+	
 	return 1;
 }
 
@@ -555,6 +566,11 @@ int writeLUCoordinateMatrixRowLine(char *fileName, double *values,unsigned long 
 		fileNameU = (char *) malloc(sizeof(char)*strlen(fileName)+2);
 		fileNameP = (char *) malloc(sizeof(char)*strlen(fileName)+2);
 		
+		if((fileNameL == NULL) || (fileNameU == NULL) || (fileNameP == NULL)) {
+			fprintf(stderr,"[%s] Error reserving memory for file names\n",__func__);
+			return 0;
+		
+		}
 	
 		sprintf(fileNameL,"L-%s",fileName);
 		sprintf(fileNameU,"U-%s",fileName);
@@ -643,6 +659,12 @@ int writeLUCoordinateMatrixRowLine(char *fileName, double *values,unsigned long 
 		fclose(fL);
 		fclose(fU);
 		fclose(fP);
+	}
+	
+	if((fileNameL == NULL) && (fileNameU == NULL) && (fileNameP == NULL)) {
+		free(fileNameL);
+		free(fileNameU);
+		free(fileNameP);
 	}
 	
 	return 1;

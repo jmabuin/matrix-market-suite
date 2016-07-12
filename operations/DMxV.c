@@ -119,7 +119,18 @@ int DMxV(int argc, char *argv[]) {
 	}
 	
 	inputMatrixFile = (char *)malloc(sizeof(char)*strlen(argv[optind])+1);
+	
+	if(inputMatrixFile == NULL) {
+		fprintf(stderr, "[%s] Error reserving memory for input matrix file name\n",__func__);
+		return 0;
+	}
+	
 	inputVectorFile = (char *)malloc(sizeof(char)*strlen(argv[optind+1])+1);
+	
+	if(inputVectorFile == NULL) {
+		fprintf(stderr, "[%s] Error reserving memory for input vector file name\n",__func__);
+		return 0;
+	}
 	
 	strcpy(inputMatrixFile,argv[optind]);
 	strcpy(inputVectorFile,argv[optind+1]);
@@ -128,6 +139,7 @@ int DMxV(int argc, char *argv[]) {
 	if(inputFormatRow){
 	
 		if(!readDenseCoordinateMatrixRowLine(inputMatrixFile,&II,&J,&values,&M,&N,&nz)){
+			usageDMxV();
 			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 			return 0;
 		}
@@ -135,6 +147,7 @@ int DMxV(int argc, char *argv[]) {
 	}
 	else {
 		if(!readDenseCoordinateMatrix(inputMatrixFile,&II,&J,&values,&M,&N,&nz)){
+			usageDMxV();
 			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 			return 0;
 		}
@@ -144,6 +157,7 @@ int DMxV(int argc, char *argv[]) {
 	
 	//Read vector
 	if(!readDenseVector(inputVectorFile, &vectorValues,&M_Vector,&N_Vector,&nz_vector)){
+		usageDMxV();
 		fprintf(stderr, "[%s] Can not read Vector\n",__func__);
 		return 0;
 	}
@@ -161,6 +175,7 @@ int DMxV(int argc, char *argv[]) {
         //Read output vector if any
 	if(outputVectorFile != NULL) {
 		if(!readDenseVector(outputVectorFile, &result,&M_Vector,&N_Vector,&nz_vector)){
+			usageDMxV();
 			fprintf(stderr, "[%s] Can not read Vector %s\n",__func__, outputVectorFile);
 			return 0;
 		}
@@ -174,6 +189,7 @@ int DMxV(int argc, char *argv[]) {
 	else{
 		cblas_dgemv(CblasRowMajor,CblasNoTrans,M,N,alpha,values,N,vectorValues,1,beta,result,1);
 	}
+	
 	fprintf(stderr, "\n[%s] Time spent in cblas_dgemv: %.6f sec\n", __func__, realtime() - t_real);
 	
 	writeDenseVector(outputFileName, result,M_Vector,N_Vector,nz_vector);
