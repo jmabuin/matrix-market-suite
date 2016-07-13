@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "[%s] DONE!", __func__);
 	}
 
-	fprintf(stderr, "\n[%s] Real time: %.3f sec; CPU: %.3f sec; User: %.3f sec; Sys: %3f sec\n", __func__, realtime() - t_real, cputime(),usertime(),systemtime());
+	fprintf(stderr, "\n[%s] Real time: %.6f sec; CPU: %.6f sec; User: %.6f sec; Sys: %6f sec\n", __func__, realtime() - t_real, cputime(),usertime(),systemtime());
 
 	return ret;
 }
