@@ -14,6 +14,29 @@
 #define PACKAGE_VERSION "0.3.0"
 #endif
 
+typedef enum {TYPEOP, TYPESOLVER} commandtype;
+
+struct st_command {
+	const char * name;
+	const char * description;
+	commandtype type;
+	int (*function)(int, char*[], int, int);
+};
+
+#define NEW_OPERATION(name, description, function_name) {#name, description, TYPEOP, function_name}
+#define NEW_SOLVER(name, description, function_name) {#name, description, TYPESOLVER, function_name}
+
+const struct st_command commands[] = {
+	NEW_OPERATION(DMxV,			"Dense matrix dot vector operation", DMxVMPI),
+	NEW_SOLVER(ConjugateGradient,		"Solves a system by using the conjugate gradient method", ConjugateGradientMPI),
+};
+
+#define SHOW_COMMANDS(mytype) \
+	for (i = 0, imax = sizeof(commands) / sizeof(com); i < imax; i++) { \
+		com = commands[i]; \
+		if (com.type != mytype) continue; \
+		fprintf(stderr, "   %-34s  %s\n", com.name, com.description); \
+	}
 
 static int usage()
 {
@@ -22,11 +45,17 @@ static int usage()
 	fprintf(stderr, "Version: %s\n", PACKAGE_VERSION);
 	fprintf(stderr, "Contact: José M. Abuín <josemanuel.abuin@usc.es>\n\n");
 	fprintf(stderr, "Usage:   MM-Suite-MPI <command> [options]\n\n");
-	fprintf(stderr, "Basic operations:\n");
-	fprintf(stderr, "Command: DMxV                               Dense matrix dot vector operation. y = alpha * A * x + beta * y\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "Solvers:\n");
-	fprintf(stderr, "Command: ConjugateGradient                  Solves a system by using the conjugate gradient method\n");
+	fprintf(stderr, "Available commands:\n");
+	
+	size_t i, imax;
+	struct st_command com;
+
+	fprintf(stderr, "\nBasic operations:\n");
+	SHOW_COMMANDS(TYPEOP);
+
+	fprintf(stderr, "\nSolvers:\n");
+	SHOW_COMMANDS(TYPESOLVER);
+
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -50,6 +79,10 @@ int main(int argc, char *argv[]) {
 	int i, ret;
 	double t_real;
 
+	struct st_command com;
+
+	size_t imax;
+
 	t_real = realtime();
 
 	if(myid == 0){
@@ -65,15 +98,23 @@ int main(int argc, char *argv[]) {
 		if (argc < 2) return 1;
 	}
 	
-	if (strcmp(argv[1], "DMxV") == 0) 			ret = DMxVMPI(argc-1, argv+1,numProcs,myid);
-	else if (strcmp(argv[1], "ConjugateGradient") == 0)	ret = ConjugateGradientMPI(argc-1, argv+1,numProcs,myid);
-	else {
+
+	for (i = 0, imax = sizeof(commands) / sizeof(com); i < imax; i++) {
+		com = commands[i];
+		if (strcmp(com.name, argv[1]) == 0) {
+			ret = com.function(argc-1, argv+1, numProcs, myid);
+			break;
+		}
+	}
+	
+	if (i == imax) {
 		fprintf(stderr, "[%s] unrecognized command '%s'\n",__func__, argv[1]);
 		return 1;
 	}
 	
 	if(myid == 0){
 		if (ret == 0) {
+			fprintf(stderr, "[%s] ERROR!\n", __func__);
 			fprintf(stderr, "[%s] Version: %s\n", __func__, PACKAGE_VERSION);
 			fprintf(stderr, "[%s] CMD:", __func__);
 			for (i = 0; i < argc; ++i)
