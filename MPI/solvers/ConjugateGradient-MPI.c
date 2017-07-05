@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <openblas/cblas.h>
 
 #include "ConjugateGradient-MPI.h"
 #include "ConjugateGradientSolver-MPI.h"
@@ -33,6 +34,8 @@ void usageConjugateGradientMPI(){
 	fprintf(stderr, "\nInput/output options:\n\n");
 	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
 	fprintf(stderr, "       -r            Input format is row per line. Default: False\n");
+	fprintf(stderr, "\nPerformance options:\n\n");
+	fprintf(stderr, "       -t INT        Number of threads to use in OpenBLAS. Default: 1\n");
 	fprintf(stderr, "\n");
 
 }
@@ -42,7 +45,7 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
 	int 			ret_code;
 	int 			option;
 	
-	unsigned long 		*I;
+	unsigned long 		*II;
 	unsigned long 		*J;
 	double 			*A;
 	
@@ -64,8 +67,9 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
 	char			*inputVectorFile = NULL;
 	
 	int			inputFormatRow = 0;
+	int			numThreads = 1;
 	
-	while ((option = getopt(argc, argv,"ro:i:")) >= 0) {
+	while ((option = getopt(argc, argv,"ro:i:t:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -81,7 +85,11 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
 			case 'r':
 				inputFormatRow = 1;
 				break;
-				
+			
+			case 't':
+				numThreads = atoi(optarg);
+				break;
+			
 			default: break;
 		}
 	
@@ -91,6 +99,8 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
 		usageConjugateGradientMPI();
 		return 0;
 	}
+	
+	openblas_set_num_threads(numThreads);
 	
 	if(outputFileName == NULL) {
 		outputFileName = (char *) malloc(sizeof(char)*6);
@@ -105,13 +115,13 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
 	
 	//Read matrix
 	if(inputFormatRow) {
-		if(!readDenseCoordinateMatrixMPIRowLine(inputMatrixFile,&I,&J,&A,&M,&local_M,&N,&nz,myid, numProcs)){
+		if(!readDenseCoordinateMatrixMPIRowLine(inputMatrixFile,&II,&J,&A,&M,&local_M,&N,&nz,myid, numProcs)){
 			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 			return 0;
 		}
 	}
 	else{
-		if(!readDenseCoordinateMatrixMPI(inputMatrixFile,&I,&J,&A,&M,&local_M,&N,&nz,myid, numProcs)){
+		if(!readDenseCoordinateMatrixMPI(inputMatrixFile,&II,&J,&A,&M,&local_M,&N,&nz,myid, numProcs)){
 			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 			return 0;
 		}
@@ -131,7 +141,7 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
         
         double t_real = realtime();
         
-	ret_code = ConjugateGradientSolverMPI(I,J,A,M,local_M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
+	ret_code = ConjugateGradientSolverMPI(II,J,A,M,local_M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
 	
 	fprintf(stderr, "\n[%s] Time spent in Conjugate Gradient: %.6f sec\n", __func__, realtime() - t_real);
 	

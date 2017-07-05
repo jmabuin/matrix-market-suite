@@ -19,10 +19,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpich/mpi.h>
+#include <mpi.h>
 #include <unistd.h>
 
-#include <cblas.h>
+#include <openblas/cblas.h>
 
 #include "DMxV-MPI.h"
 
@@ -36,6 +36,8 @@ void usageDMxVMPI(){
 	fprintf(stderr, "\nParameters options:\n\n");
 	fprintf(stderr, "       -a DOUBLE     Alpha. Default: 1.0\n");
 	fprintf(stderr, "       -b DOUBLE     Beta. Default: 0.0\n");
+	fprintf(stderr, "\nPerformance options:\n\n");
+	fprintf(stderr, "       -t INT        Number of threads to use in OpenBLAS. Default: 1\n");
 	fprintf(stderr, "\n");
 
 }
@@ -71,9 +73,11 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 	double			alpha = 1.0;
 	double			beta = 0.0;
 	
+	int 		numThreads = 1;
+	
 	int			i, j;
 	
-	while ((option = getopt(argc, argv,"ro:a:b:")) >= 0) {
+	while ((option = getopt(argc, argv,"ro:a:b:t:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -95,6 +99,10 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 				alpha = atof(optarg);
 				break;
 			
+			case 't':
+				numThreads = atoi(optarg);
+				break;
+			
 			default: break;
 		}
 	
@@ -107,6 +115,8 @@ int DMxVMPI(int argc, char *argv[], int numProcs, int myid) {
 		}
 		return 0;
 	}
+	
+	openblas_set_num_threads(numThreads);
 	
 	if(optind + 3 == argc) { //We have an output vector
 	

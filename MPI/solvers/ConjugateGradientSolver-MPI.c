@@ -20,7 +20,7 @@
 #include <cblas.h>
 #include "ConjugateGradientSolver-MPI.h"
 
-#include <mpich/mpi.h>
+#include <mpi.h>
 
 int ConjugateGradientSolverMPI(unsigned long *II, unsigned long *J, double *A, unsigned long M,unsigned long local_M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector, int numIterations) {
 

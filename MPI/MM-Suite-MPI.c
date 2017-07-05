@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <mpich/mpi.h>
+//#include <mpich/mpi.h>
+#include <mpi.h>
 
 #include "utils/utils-MPI.h"
 #include "../utils/utils.h"
