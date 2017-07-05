@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <cblas.h>
+#include <openblas/cblas.h>
 
 #include "DMxV.h"
 
@@ -32,6 +32,8 @@ void usageDMxDM(){
 	fprintf(stderr, "\nInput/output options:\n\n");
 	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
 	fprintf(stderr, "       -r            Input format is row per line. Default: False\n");
+	fprintf(stderr, "\nPerformance options:\n\n");
+	fprintf(stderr, "       -t INT        Number of threads to use in OpenBLAS. Default: 1\n");
 	fprintf(stderr, "\n");
 
 }
@@ -65,8 +67,9 @@ int DMxDM(int argc, char *argv[]) {
 	
 	int			inputFormatRow = 0;
 	
+	int			numThreads = 1;
 	
-	while ((option = getopt(argc, argv,"ro:")) >= 0) {
+	while ((option = getopt(argc, argv,"ro:t:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -79,6 +82,10 @@ int DMxDM(int argc, char *argv[]) {
 			case 'r':
 				inputFormatRow = 1;
 				break;
+				
+			case 't':
+				numThreads = atoi(optarg);
+				break;
 			
 			default: break;
 		}
@@ -89,6 +96,8 @@ int DMxDM(int argc, char *argv[]) {
 		usageDMxDM();
 		return 0;
 	}
+	
+	openblas_set_num_threads(numThreads);
 	
 	if(outputFileName == NULL) {
 		outputFileName = (char *) malloc(sizeof(char)*7);

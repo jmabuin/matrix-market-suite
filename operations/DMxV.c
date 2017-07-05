@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <cblas.h>
+#include <openblas/cblas.h>
 
 #include "DMxV.h"
 #include "basic.h"
@@ -36,6 +36,8 @@ void usageDMxV(){
 	fprintf(stderr, "\nParameters options:\n\n");
 	fprintf(stderr, "       -a DOUBLE     Alpha. Default: 1.0\n");
 	fprintf(stderr, "       -b DOUBLE     Beta. Default: 0.0\n");
+	fprintf(stderr, "\nPerformance options:\n\n");
+	fprintf(stderr, "       -t INT        Number of threads to use in OpenBLAS. Default: 1\n");
 	fprintf(stderr, "\n");
 
 }
@@ -67,11 +69,12 @@ int DMxV(int argc, char *argv[]) {
 	
 	int			inputFormatRow = 0;
 	int			basicOps = 0;
+	int			numThreads = 1;
 	
 	double			alpha = 1.0;
 	double			beta = 0.0;
 	
-	while ((option = getopt(argc, argv,"ero:b:a:")) >= 0) {
+	while ((option = getopt(argc, argv,"ero:b:a:t:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -97,6 +100,10 @@ int DMxV(int argc, char *argv[]) {
 				alpha = atof(optarg);
 				break;
 				
+			case 't':
+				numThreads = atoi(optarg);
+				break;
+				
 			default: break;
 		}
 	
@@ -106,6 +113,8 @@ int DMxV(int argc, char *argv[]) {
 		usageDMxV();
 		return 0;
 	}
+	
+	openblas_set_num_threads(numThreads);
 	
 	if(optind + 3 == argc) { //We have an output vector
 	

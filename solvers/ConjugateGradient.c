@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <openblas/cblas.h>
 
 #include "ConjugateGradient.h"
 #include "ConjugateGradientSolver.h"
@@ -35,6 +36,8 @@ void usageConjugateGradient(){
 	fprintf(stderr, "\nInput/output options:\n\n");
 	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
 	fprintf(stderr, "       -r            Input format is row per line. Default: False\n");
+	fprintf(stderr, "\nPerformance options:\n\n");
+	fprintf(stderr, "       -t INT        Number of threads to use in OpenBLAS. Default: 1\n");
 	fprintf(stderr, "\n");
 
 }
@@ -44,7 +47,7 @@ int ConjugateGradient(int argc, char *argv[]) {
 	int 			ret_code;
 	int 			option;
 	
-	unsigned long 		*I;
+	unsigned long 		*II;
 	unsigned long 		*J;
 	double 			*A;
 	
@@ -64,9 +67,12 @@ int ConjugateGradient(int argc, char *argv[]) {
 	char			*inputMatrixFile = NULL;
 	char			*inputVectorFile = NULL;
 	
+	int			numThreads = 1;
+	
 	int			inputFormatRow = 0;
 	int			basicOps = 0;
-	while ((option = getopt(argc, argv,"bro:i:")) >= 0) {
+	
+	while ((option = getopt(argc, argv,"bro:i:t:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -86,7 +92,11 @@ int ConjugateGradient(int argc, char *argv[]) {
 			case 'b':
 				basicOps = 1;
 				break;
-				
+			
+			case 't':
+				numThreads = atoi(optarg);
+				break;
+			
 			default: break;
 		}
 	
@@ -96,6 +106,8 @@ int ConjugateGradient(int argc, char *argv[]) {
 		usageConjugateGradient();
 		return 0;
 	}
+	
+	openblas_set_num_threads(numThreads);
 	
 	if(outputFileName == NULL) {
 		outputFileName = (char *) malloc(sizeof(char)*7);
@@ -113,7 +125,7 @@ int ConjugateGradient(int argc, char *argv[]) {
 	//Read matrix
 	if(inputFormatRow){
 	
-		if(!readDenseCoordinateMatrixRowLine(inputMatrixFile,&I,&J,&A,&M,&N,&nz)){
+		if(!readDenseCoordinateMatrixRowLine(inputMatrixFile,&II,&J,&A,&M,&N,&nz)){
 			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 			return 0;
 		}
@@ -123,7 +135,7 @@ int ConjugateGradient(int argc, char *argv[]) {
 	
 	}
 	else {
-		if(!readDenseCoordinateMatrix(inputMatrixFile,&I,&J,&A,&M,&N,&nz)){
+		if(!readDenseCoordinateMatrix(inputMatrixFile,&II,&J,&A,&M,&N,&nz)){
 			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 			return 0;
 		}
@@ -145,10 +157,10 @@ int ConjugateGradient(int argc, char *argv[]) {
 
 
 	if(basicOps){
-		ret_code = ConjugateGradientSolverBasic(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
+		ret_code = ConjugateGradientSolverBasic(II,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
 	}
 	else{
-		ret_code = ConjugateGradientSolver(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
+		ret_code = ConjugateGradientSolver(II,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
 	}
 	fprintf(stderr, "\n[%s] Time spent in Conjugate Gradient: %.6f sec\n", __func__, realtime() - t_real);
 	//ret_code = 0;
