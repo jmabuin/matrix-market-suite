@@ -13,13 +13,13 @@ To install them Debian:
 
 	sudo aptitude install libopenblas-base libopenblas-dev liblapacke liblapacke-dev
 
-Also, the compilers used to build the tool are [gcc][4] and [gfortran][5].
+Also, the compiler used to build the tool is [gcc][4].
 
 ## 2.2 Compiling
 In order to compile **Matrix Market Suite**, the user only has to execute:
 
 	make
-	
+
 This command creates the *MM-Suite* executable.
 
 # 3. Commands
@@ -52,9 +52,9 @@ To build the parallel MPI version, the user has to enter the MPI directory and r
 
 	make
 	
-Dependencies for this versions are only [mpich][6]
+Dependencies for this versions are only [openmpi][9]
 
-	sudo aptitude install mpich libmpich-dev
+	sudo aptitude install libopenmpi-dev openmpi-common openmpi-bin libopenmpi2
 
 
 # 5. Examples
@@ -167,3 +167,4 @@ Which is the input vector from the conjugate gradient example.
 [6]: https://www.mpich.org/
 [7]: https://www.cise.ufl.edu/research/sparse/matrices/
 [8]: http://math.nist.gov/MatrixMarket/data/Harwell-Boeing/
+[9]: https://www.open-mpi.org/
