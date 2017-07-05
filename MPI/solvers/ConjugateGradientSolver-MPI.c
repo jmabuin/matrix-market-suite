@@ -17,7 +17,7 @@
   * along with Matrix Market Suite. If not, see <http://www.gnu.org/licenses/>.
   */
 
-#include <cblas.h>
+#include <openblas/cblas.h>
 #include "ConjugateGradientSolver-MPI.h"
 
 #include <mpi.h>
