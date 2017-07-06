@@ -71,7 +71,7 @@ In this example a dense symmetrix matrix of dimensions 10x10 is created.
 	
 Where:
 * *-o Matrix-Example-10x10.mtx* Is the option and the file name of the result matrix.
-* *-s Indicates that we want to create a symmetric matrix.
+* *-s* Indicates that we want to create a symmetric matrix.
 * *10* Is the number of rows.
 * *10* Is the number of cols.
 * *87* Is the seed used to fill the matrix.
