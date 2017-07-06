@@ -1,5 +1,5 @@
 /**
-  * Copyright 2016 José Manuel Abuín Mosquera <josemanuel.abuin@usc.es>
+  * Copyright 2017 José Manuel Abuín Mosquera <josemanuel.abuin@usc.es>
   * 
   * This file is part of Matrix Market Suite.
   *
@@ -46,7 +46,7 @@ int JacobiSolver(unsigned long *II, unsigned long *J, double *A, unsigned long M
 	
 	if(!isDiagonallyDominant(A,M,N,nz)){
 		fprintf(stderr, "[%s] The matrix is not diagonally dominant\n",__func__);
-		return 0;
+		//return 0;
 	}
 	
 	getLUValues(LU, A,M,N,nz);
@@ -99,17 +99,14 @@ int JacobiSolver(unsigned long *II, unsigned long *J, double *A, unsigned long M
 		k++;
 	}
 	
-	
-
 	memcpy(b, x2, N*sizeof(double));
 
 	free(x1);
-        free(x2);
-        free(res);
+	free(x2);
+	free(res);
 
 	fprintf(stderr, "[%s] Number of iterations %lu\n",__func__,k);
 	
 	return 1;
-	
 	
 }

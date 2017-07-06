@@ -32,6 +32,7 @@
 #include <stddef.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <math.h>
 
 #include "mmio.h"
 

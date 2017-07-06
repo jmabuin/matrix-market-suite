@@ -134,9 +134,9 @@ int Jacobi(int argc, char *argv[]) {
 	
 	
         
-        //double *y=(double *) malloc(nz_vector * sizeof(double));
+    //double *y=(double *) malloc(nz_vector * sizeof(double));
         
-        fprintf(stderr,"[%s] Solving system using Jacobi method\n",__func__);
+    fprintf(stderr,"[%s] Solving system using Jacobi method\n",__func__);
 	ret_code = JacobiSolver(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
 	//ret_code = 0;
 	

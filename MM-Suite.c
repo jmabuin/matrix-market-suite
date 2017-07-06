@@ -1,3 +1,22 @@
+/**
+  * Copyright 2017 José Manuel Abuín Mosquera <josemanuel.abuin@usc.es>
+  *
+  * This file is part of Matrix Market Suite.
+  *
+  * Matrix Market Suite is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation, either version 3 of the License, or
+  * (at your option) any later version.
+  *
+  * Matrix Market Suite is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with Matrix Market Suite. If not, see <http://www.gnu.org/licenses/>.
+  */
+
 #include <stdio.h>
 #include <string.h>
 #include "utils/utils.h"
@@ -15,7 +34,7 @@
 #include "solvers/Jacobi.h"
 
 #ifndef PACKAGE_VERSION
-#define PACKAGE_VERSION "0.3.0"
+#define PACKAGE_VERSION "0.3.2"
 #endif
 
 typedef enum {TYPECOM, TYPEOP, TYPESOLVER} commandtype;
@@ -39,6 +58,7 @@ const struct st_command commands[] = {
 	NEW_OPERATION(DMxDM,			"Dense matrix dot dense matrix operation"),
 	NEW_OPERATION(LUDecomposition,		"LU factorization of a matrix"),
 	NEW_SOLVER(ConjugateGradient,		"Solves a system by using the conjugate gradient method"),
+	NEW_SOLVER(Jacobi,		"Solves a system by using the Jacobi method"),
 };
 
 #define SHOW_COMMANDS(mytype) \
