@@ -1,5 +1,5 @@
 /**
-  * Copyright 2016 José Manuel Abuín Mosquera <josemanuel.abuin@usc.es>
+  * Copyright 2017 José Manuel Abuín Mosquera <josemanuel.abuin@usc.es>
   * 
   * This file is part of Matrix Market Suite.
   *
@@ -26,6 +26,10 @@
 #include "CreateDenseMatrixGeneral.h"
 #include "CreateDenseMatrixGeneralRowLine.h"
 #include "CreateDenseMatrixSymmetricRowLine.h"
+#include "CreateDenseMatrixGeneralDiagonallyDominant.h"
+#include "CreateDenseMatrixGeneralDiagonallyDominantRowLine.h"
+#include "CreateDenseMatrixSymmetricDiagonallyDominantRowLine.h"
+#include "CreateDenseMatrixSymmetricDiagonallyDominant.h"
 #include "../utils/utils.h"
 
 void usageCreateDenseMatrix(){
@@ -36,6 +40,7 @@ void usageCreateDenseMatrix(){
 	fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
 	fprintf(stderr, "       -r            Output format will be row per line. Default: False\n");
 	fprintf(stderr, "       -s            Output will be a symmetric matrix.  Default: False\n");
+	fprintf(stderr, "       -d            Output will be a diagonally dominant matrix.  Default: False\n");
 	fprintf(stderr, "\n");
 
 }
@@ -49,15 +54,18 @@ int CreateDenseMatrix(int argc, char *argv[]) {
 	 *		-s 		=> Symmetric matrix
 	 *		-r 		=> Row per line matrix
 	 *		-o [STR] 	=> Output file name
+	 *		-d		=> Diagonally dominant matrix
 	 */
 	
-	int	inputFormatRow 	= 0;
-	int	symmetric	= 0;
+	int	inputFormatRow		= 0;
+	int	symmetric			= 0;
+	int diagonallyDominant 	= 0;
+
 	char	*outputFileName = NULL;
 	
 	int 	option;
 	
-	while ((option = getopt(argc, argv,"rso:")) >= 0) {
+	while ((option = getopt(argc, argv,"rso:d")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -73,6 +81,10 @@ int CreateDenseMatrix(int argc, char *argv[]) {
 				
 			case 'r':
 				inputFormatRow = 1;
+				break;
+
+			case 'd':
+				diagonallyDominant = 1;
 				break;
 				
 			default: break;
@@ -92,21 +104,33 @@ int CreateDenseMatrix(int argc, char *argv[]) {
 	
 	unsigned long int numRows 	= atol(argv[optind]);
 	unsigned long int numCols 	= atol(argv[optind+1]);
-	unsigned int seed		= atoi(argv[optind+2]);
+	unsigned int seed			= atoi(argv[optind+2]);
 	
-	if (symmetric && inputFormatRow) { //Case of symmetric matrix and row per line
+	if (symmetric && inputFormatRow && !diagonallyDominant) { //Case of symmetric matrix and row per line
 		CreateDenseMatrixSymmetricRowLine(outputFileName, numRows, numCols, seed);
 	}
-	else if (!symmetric && inputFormatRow) { //Case of general matrix and row per line
+	else if (!symmetric && inputFormatRow && !diagonallyDominant) { //Case of general matrix and row per line
 		CreateDenseMatrixGeneralRowLine(outputFileName, numRows, numCols, seed);
 	}
-	else if (symmetric && !inputFormatRow) { //Case of symmetric matrix and coordinate
+	else if (symmetric && !inputFormatRow && !diagonallyDominant) { //Case of symmetric matrix and coordinate
 		CreateDenseMatrixSymmetric(outputFileName, numRows, numCols, seed);
 	}
-	else if (!symmetric && !inputFormatRow) { //Case of general matrix and coordinate
+	else if (!symmetric && !inputFormatRow && !diagonallyDominant) { //Case of general matrix and coordinate
 		CreateDenseMatrixGeneral(outputFileName, numRows, numCols, seed);
 	}
-	
+	else if (symmetric && inputFormatRow && diagonallyDominant) { //Case of symmetric matrix and row per line
+		CreateDenseMatrixSymmetricDiagonallyDominantRowLine(outputFileName, numRows, numCols, seed);
+	}
+	else if (!symmetric && inputFormatRow && diagonallyDominant) { //Case of general matrix and row per line
+		CreateDenseMatrixGeneralDiagonallyDominantRowLine(outputFileName, numRows, numCols, seed);
+	}
+	else if (symmetric && !inputFormatRow && diagonallyDominant) { //Case of symmetric matrix and coordinate
+		CreateDenseMatrixSymmetricDiagonallyDominant(outputFileName, numRows, numCols, seed);
+	}
+	else if (!symmetric && !inputFormatRow && diagonallyDominant) { //Case of general matrix and coordinate
+		CreateDenseMatrixGeneralDiagonallyDominant(outputFileName, numRows, numCols, seed);
+	}
+
 	return 1;
 }
 
