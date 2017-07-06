@@ -27,8 +27,9 @@ This command creates the *MM-Suite* executable.
 Available commands are:
 
 ## Input/Output
-* **CreateDenseMatrix** - creates a dense matrix. It can be a symmetric or general matrix depending on the arguments.
+* **CreateDenseMatrix** - creates a dense matrix. It can be a symmetric, generic or diagonally dominant matrix, or a combination of all of them, depending on the arguments.
 * **CreateDenseVector** - creates a dense vector.
+* **CreateSparseMatrix** - creates a sparse matrix.
 
 ## Basic operations
 * **DMxV** - Dense matrix dot vector operation.
@@ -37,6 +38,11 @@ Available commands are:
 
 ## Solvers
 * **ConjugateGradient** - Solves a system by using the conjugate gradient method.
+* **Jacobi** - Solves a system by using the Jacobi method.
+
+To check the available options for a given command, execute:
+
+    MM-Suite <Command-name>
 
 # 4. Versions
 ## 4.1. MPI version
