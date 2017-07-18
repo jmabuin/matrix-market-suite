@@ -112,10 +112,7 @@ int Jacobi(int argc, char *argv[]) {
 			fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
 			return 0;
 		}
-		
-		//writeDenseVector("stdout",values,M,N,nz);
-		
-	
+			
 	}
 	else {
 		if(!readDenseCoordinateMatrix(inputMatrixFile,&I,&J,&A,&M,&N,&nz)){
@@ -132,17 +129,15 @@ int Jacobi(int argc, char *argv[]) {
 		return 0;
 	}
 	
-	
-        
-    //double *y=(double *) malloc(nz_vector * sizeof(double));
+	double *x=(double *) calloc(nz_vector,sizeof(double));
         
     fprintf(stderr,"[%s] Solving system using Jacobi method\n",__func__);
-	ret_code = JacobiSolver(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
-	//ret_code = 0;
+	
+	ret_code = JacobiSolver(I,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector,x, iterationNumber);
 	
 	if(ret_code){
 	
-		writeDenseVector(outputFileName, b,M_Vector,N_Vector,nz_vector);
+		writeDenseVector(outputFileName, x,M_Vector,N_Vector,nz_vector);
 	
 	}
 	else{

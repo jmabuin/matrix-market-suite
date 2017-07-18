@@ -20,7 +20,7 @@
 #include <cblas.h>
 #include "JacobiSolver.h"
 
-int JacobiSolver(unsigned long *II, unsigned long *J, double *A, unsigned long M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector, int iterationNumber) {
+int JacobiSolver(unsigned long *II, unsigned long *J, double *A, unsigned long M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector,double *x2, int iterationNumber) {
 	
 	//Jacobi Method as shown in the example from https://en.wikipedia.org/wiki/Jacobi_method
 	
@@ -33,7 +33,7 @@ int JacobiSolver(unsigned long *II, unsigned long *J, double *A, unsigned long M
 	
 	//Initial solution
 	double *x1=(double *) calloc(nz_vector,sizeof(double));
-	double *x2=(double *) calloc(nz_vector,sizeof(double));
+	//double *x2=(double *) calloc(nz_vector,sizeof(double));
 	
 	double *res=(double *) calloc(nz_vector,sizeof(double));
 	
@@ -64,8 +64,8 @@ int JacobiSolver(unsigned long *II, unsigned long *J, double *A, unsigned long M
 	cblas_dgemm(CblasRowMajor,CblasNoTrans,CblasNoTrans, M, N, N, -1.0, Dinv, N, LU, N, 0.0, T, N);
 	//writeDenseCoordinateMatrixRowLine("stdout", T,M,N,nz);
 	
-	//C=-D^{-1}B
-	cblas_dgemv(CblasRowMajor, CblasNoTrans, M,N , 1.0, Dinv, N, b, 1, -1.0, C, 1);
+	//C=-D^{-1}b
+	cblas_dgemv(CblasRowMajor, CblasNoTrans, M,N , 1.0, Dinv, N, b, 1, 0.0, C, 1);
 	
 	//writeDenseVector("stdout", C,nz_vector,1, nz_vector);
 	unsigned long maxIterations = M*2;
@@ -99,10 +99,10 @@ int JacobiSolver(unsigned long *II, unsigned long *J, double *A, unsigned long M
 		k++;
 	}
 	
-	memcpy(b, x2, N*sizeof(double));
+	//memcpy(b, x2, N*sizeof(double));
 
 	free(x1);
-	free(x2);
+	//free(x2);
 	free(res);
 
 	fprintf(stderr, "[%s] Number of iterations %lu\n",__func__,k);

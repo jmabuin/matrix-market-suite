@@ -20,14 +20,14 @@
 #include "ConjugateGradientSolverBasic.h"
 
 
-int ConjugateGradientSolverBasic(unsigned long *II, unsigned long *J, double *A, unsigned long M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector, int iterationNumber) {
+int ConjugateGradientSolverBasic(unsigned long *II, unsigned long *J, double *A, unsigned long M, unsigned long N, unsigned long long nz, double *b, unsigned long M_Vector, unsigned long N_Vector, unsigned long long nz_vector,double *x, int iterationNumber) {
 	
 	//A*x=b
 
         double *Ap=(double *) malloc(nz_vector * sizeof(double));
         double *r=(double *) malloc(nz_vector * sizeof(double));
         double *p=(double *) malloc(nz_vector * sizeof(double));
-	double *x=(double *) calloc(nz_vector,sizeof(double));
+	//double *x=(double *) calloc(nz_vector,sizeof(double));
 	
 	//r = b-A*x
 	//If we take x=0 the init multiplication is avoided and r=b
@@ -87,12 +87,12 @@ int ConjugateGradientSolverBasic(unsigned long *II, unsigned long *J, double *A,
 		k++;
 	}
 	
-	memcpy(b, x, N*sizeof(double));
+	//memcpy(b, x, N*sizeof(double));
 
         free(Ap);
         free(r);
         free(p);
-	free(x);
+	//free(x);
 
 	fprintf(stderr, "[%s] Number of iterations %lu\n",__func__,k);
 

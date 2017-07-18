@@ -151,23 +151,25 @@ int ConjugateGradient(int argc, char *argv[]) {
 	
 	
         
-        //double *y=(double *) malloc(nz_vector * sizeof(double));
-        fprintf(stderr,"[%s] Solving system using conjugate gradient method\n",__func__);
-        double t_real = realtime();
+    //double *y=(double *) malloc(nz_vector * sizeof(double));
+    fprintf(stderr,"[%s] Solving system using conjugate gradient method\n",__func__);
+    double t_real = realtime();
 
+	// Vector to store result
+	double *x=(double *) calloc(nz_vector,sizeof(double));
 
 	if(basicOps){
-		ret_code = ConjugateGradientSolverBasic(II,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
+		ret_code = ConjugateGradientSolverBasic(II,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, x, iterationNumber);
 	}
 	else{
-		ret_code = ConjugateGradientSolver(II,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
+		ret_code = ConjugateGradientSolver(II,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, x, iterationNumber);
 	}
+	
 	fprintf(stderr, "\n[%s] Time spent in Conjugate Gradient: %.6f sec\n", __func__, realtime() - t_real);
-	//ret_code = 0;
 	
 	if(ret_code){
 	
-		writeDenseVector(outputFileName, b,M_Vector,N_Vector,nz_vector);
+		writeDenseVector(outputFileName, x,M_Vector,N_Vector,nz_vector);
 	
 	}
 	else{
