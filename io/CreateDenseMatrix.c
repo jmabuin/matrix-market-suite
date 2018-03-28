@@ -41,6 +41,8 @@ void usageCreateDenseMatrix(){
 	fprintf(stderr, "       -r            Output format will be row per line. Default: False\n");
 	fprintf(stderr, "       -s            Output will be a symmetric matrix.  Default: False\n");
 	fprintf(stderr, "       -d            Output will be a diagonally dominant matrix.  Default: False\n");
+    fprintf(stderr, "       -l            Lower value for data to put in the matrix.  Default: 0.0\n");
+    fprintf(stderr, "       -m           Max value for data to put in the matrix.  Default: 1.0\n");
 	fprintf(stderr, "\n");
 
 }
@@ -63,9 +65,12 @@ int CreateDenseMatrix(int argc, char *argv[]) {
 
 	char	*outputFileName = NULL;
 	
+    double min = 0.0;
+    double max = 1.0;
+    
 	int 	option;
 	
-	while ((option = getopt(argc, argv,"rso:d")) >= 0) {
+	while ((option = getopt(argc, argv,"rso:dl:m:")) >= 0) {
 		switch (option) {
 			case 'o' : 
 				//free(outputFileName);
@@ -86,7 +91,15 @@ int CreateDenseMatrix(int argc, char *argv[]) {
 			case 'd':
 				diagonallyDominant = 1;
 				break;
-				
+            
+            case 'l':
+                min = (double) atof(optarg);
+                break;
+                
+            case 'm':
+                max = (double) atof(optarg);
+                break;
+                
 			default: break;
 		}
 	
@@ -116,7 +129,7 @@ int CreateDenseMatrix(int argc, char *argv[]) {
 		CreateDenseMatrixSymmetric(outputFileName, numRows, numCols, seed);
 	}
 	else if (!symmetric && !inputFormatRow && !diagonallyDominant) { //Case of general matrix and coordinate
-		CreateDenseMatrixGeneral(outputFileName, numRows, numCols, seed);
+		CreateDenseMatrixGeneral(outputFileName, numRows, numCols, seed, min, max);
 	}
 	else if (symmetric && inputFormatRow && diagonallyDominant) { //Case of symmetric matrix and row per line
 		CreateDenseMatrixSymmetricDiagonallyDominantRowLine(outputFileName, numRows, numCols, seed);
