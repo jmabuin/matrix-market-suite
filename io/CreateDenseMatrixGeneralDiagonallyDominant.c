@@ -24,7 +24,7 @@
 
 #include "CreateDenseMatrixGeneralDiagonallyDominant.h"
 
-int CreateDenseMatrixGeneralDiagonallyDominant(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed) {
+int CreateDenseMatrixGeneralDiagonallyDominant(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed, double min, double max) {
 
 //Options: numRows numCols fileName seed
 
@@ -72,14 +72,15 @@ int CreateDenseMatrixGeneralDiagonallyDominant(char *fileName, unsigned long int
 		for(j = 0 ; j < numCols; j++){
 
 			if(i != j) {
-				value = ((double)rand() / (double)RAND_MAX)/100;
+				value = randfrom(min, max);
 				//fprintf(output, "%d %d %f\n",i+1,j+1,value);
 				tmpValues[j] = value;
 
 				diagonalValue = diagonalValue + fabs(value);
 			}
 		}
-
+        
+        // To be diagonally dominant, the value in the diagonal have to be bigger than the sum of the values in the row
 		diagonalValue = diagonalValue + 1.0;
 
 		tmpValues[ i] = diagonalValue;

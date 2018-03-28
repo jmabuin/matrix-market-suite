@@ -141,7 +141,7 @@ int CreateDenseMatrix(int argc, char *argv[]) {
 		CreateDenseMatrixSymmetricDiagonallyDominant(outputFileName, numRows, numCols, seed);
 	}
 	else if (!symmetric && !inputFormatRow && diagonallyDominant) { //Case of general matrix and coordinate
-		CreateDenseMatrixGeneralDiagonallyDominant(outputFileName, numRows, numCols, seed);
+		CreateDenseMatrixGeneralDiagonallyDominant(outputFileName, numRows, numCols, seed, min, max);
 	}
 
 	return 1;
