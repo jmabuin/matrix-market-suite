@@ -708,3 +708,9 @@ int isDiagonallyDominant(double *values, unsigned M, unsigned N, unsigned long n
 
 }
 
+/* generate a random floating point number from min to max */
+double randfrom(double min, double max)  {
+    double range = (max - min); 
+    double div = RAND_MAX / range;
+    return min + (rand() / div);
+}
