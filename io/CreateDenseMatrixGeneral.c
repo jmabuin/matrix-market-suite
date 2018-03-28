@@ -66,8 +66,6 @@ int CreateDenseMatrixGeneral(char *fileName, unsigned long int numRows, unsigned
 	
 		for(j = 0; j< numCols; j++){
 
-			//value = ((double)rand() / (double)RAND_MAX)/100;
-            
             value = randfrom(min, max);
 			fprintf(output, "%lu %lu %lg\n",i+1,j+1,value);
 
