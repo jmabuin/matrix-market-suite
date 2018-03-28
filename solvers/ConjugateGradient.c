@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <openblas/cblas.h>
+#include <cblas.h>
 
 #include "ConjugateGradient.h"
 #include "ConjugateGradientSolver.h"

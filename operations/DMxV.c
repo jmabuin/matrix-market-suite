@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <openblas/cblas.h>
+#include <cblas.h>
 
 #include "DMxV.h"
 #include "basic.h"
