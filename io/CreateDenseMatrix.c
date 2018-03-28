@@ -120,25 +120,25 @@ int CreateDenseMatrix(int argc, char *argv[]) {
 	unsigned int seed			= atoi(argv[optind+2]);
 	
 	if (symmetric && inputFormatRow && !diagonallyDominant) { //Case of symmetric matrix and row per line
-		CreateDenseMatrixSymmetricRowLine(outputFileName, numRows, numCols, seed);
+		CreateDenseMatrixSymmetricRowLine(outputFileName, numRows, numCols, seed, min, max);
 	}
 	else if (!symmetric && inputFormatRow && !diagonallyDominant) { //Case of general matrix and row per line
-		CreateDenseMatrixGeneralRowLine(outputFileName, numRows, numCols, seed);
+		CreateDenseMatrixGeneralRowLine(outputFileName, numRows, numCols, seed, min, max);
 	}
 	else if (symmetric && !inputFormatRow && !diagonallyDominant) { //Case of symmetric matrix and coordinate
-		CreateDenseMatrixSymmetric(outputFileName, numRows, numCols, seed);
+		CreateDenseMatrixSymmetric(outputFileName, numRows, numCols, seed, min, max);
 	}
 	else if (!symmetric && !inputFormatRow && !diagonallyDominant) { //Case of general matrix and coordinate
 		CreateDenseMatrixGeneral(outputFileName, numRows, numCols, seed, min, max);
 	}
 	else if (symmetric && inputFormatRow && diagonallyDominant) { //Case of symmetric matrix and row per line
-		CreateDenseMatrixSymmetricDiagonallyDominantRowLine(outputFileName, numRows, numCols, seed);
+		CreateDenseMatrixSymmetricDiagonallyDominantRowLine(outputFileName, numRows, numCols, seed, min, max);
 	}
 	else if (!symmetric && inputFormatRow && diagonallyDominant) { //Case of general matrix and row per line
-		CreateDenseMatrixGeneralDiagonallyDominantRowLine(outputFileName, numRows, numCols, seed);
+		CreateDenseMatrixGeneralDiagonallyDominantRowLine(outputFileName, numRows, numCols, seed, min, max);
 	}
 	else if (symmetric && !inputFormatRow && diagonallyDominant) { //Case of symmetric matrix and coordinate
-		CreateDenseMatrixSymmetricDiagonallyDominant(outputFileName, numRows, numCols, seed);
+		CreateDenseMatrixSymmetricDiagonallyDominant(outputFileName, numRows, numCols, seed, min, max);
 	}
 	else if (!symmetric && !inputFormatRow && diagonallyDominant) { //Case of general matrix and coordinate
 		CreateDenseMatrixGeneralDiagonallyDominant(outputFileName, numRows, numCols, seed, min, max);

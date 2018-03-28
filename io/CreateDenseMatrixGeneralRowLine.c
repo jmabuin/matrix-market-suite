@@ -23,7 +23,7 @@
 
 #include "CreateDenseMatrixGeneralRowLine.h"
 
-int CreateDenseMatrixGeneralRowLine(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed) {
+int CreateDenseMatrixGeneralRowLine(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed, double min, double max) {
 //Options: numRows numCols fileName seed
 
 	FILE *output;
@@ -66,7 +66,7 @@ int CreateDenseMatrixGeneralRowLine(char *fileName, unsigned long int numRows, u
 	
 		for(j = 0; j< numCols; j++){
 
-			value = ((double)rand() / (double)RAND_MAX)/100;
+			value = randfrom(min, max);
 			
 			fprintf(output, "%lg,",value);
 			

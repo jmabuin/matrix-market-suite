@@ -23,7 +23,7 @@
 
 #include "CreateDenseMatrixSymmetric.h"
 
-int CreateDenseMatrixSymmetric(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed) {
+int CreateDenseMatrixSymmetric(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed, double min, double max) {
 //Options: numRows numCols fileName seed
 
 	FILE *output;
@@ -66,7 +66,7 @@ int CreateDenseMatrixSymmetric(char *fileName, unsigned long int numRows, unsign
 	
 		for(j = 0; j<=i; j++){
 
-			value = ((double)rand() / (double)RAND_MAX)/100;
+			value = randfrom(min, max);
 			fprintf(output, "%d %d %f\n",i+1,j+1,value);
 
 		}

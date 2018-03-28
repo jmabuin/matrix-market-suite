@@ -18,5 +18,6 @@
   */
 
 #include "../utils/mmio.h"
+#include "../utils/utils.h"
 
-int CreateDenseMatrixSymmetricRowLine(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed);
+int CreateDenseMatrixSymmetricRowLine(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed, double min, double max);

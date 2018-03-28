@@ -23,7 +23,7 @@
 #include <math.h>
 #include "CreateDenseMatrixSymmetricDiagonallyDominantRowLine.h"
 
-int CreateDenseMatrixSymmetricDiagonallyDominantRowLine(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed) {
+int CreateDenseMatrixSymmetricDiagonallyDominantRowLine(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed, double min, double max) {
 //Options: numRows numCols fileName seed
 
 	FILE *output;
@@ -67,7 +67,7 @@ int CreateDenseMatrixSymmetricDiagonallyDominantRowLine(char *fileName, unsigned
 
 		for(j = 0; j<= i; j++){
 
-			value = ((double)rand() / (double)RAND_MAX)/100;
+			value = randfrom(min, max);
 
 			values[i*numCols+j] = value;
 
