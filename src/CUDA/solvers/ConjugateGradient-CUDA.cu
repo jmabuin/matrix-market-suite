@@ -1,6 +1,6 @@
 /**
   * Copyright 2019 José Manuel Abuín Mosquera <josemanuel.abuin@usc.es>
-  * 
+  *
   * This file is part of Matrix Market Suite.
   *
   * Matrix Market Suite is free software: you can redistribute it and/or modify
@@ -12,25 +12,25 @@
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   * GNU General Public License for more details.
-  * 
+  *
   * You should have received a copy of the GNU General Public License
   * along with Matrix Market Suite. If not, see <http://www.gnu.org/licenses/>.
   */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <cblas.h>
 
-#include "ConjugateGradient-MPI.h"
-#include "ConjugateGradientSolver-MPI.h"
+//#include <cblas.h>
 
-void usageConjugateGradientMPI(){
+#include "ConjugateGradient-CUDA.h"
+#include "ConjugateGradientSolver-CUDA.h"
+#include "ConjugateGradientSolverBasic-CUDA.h"
+
+void usageConjugateGradient(){
 
     fprintf(stderr, "\n");
     fprintf(stderr, "Usage: MM-Suite ConjugateGradient [options] <input-matrix> <input-vector>\n");
     fprintf(stderr, "Algorithm options:\n\n");
     fprintf(stderr, "       -i INT        Iteration number. Default: number of matrix rows * 2\n");
+    fprintf(stderr, "       -b            Uses basic operations instead of optimized BLAS libraries. Default: False\n");
     fprintf(stderr, "\nInput/output options:\n\n");
     fprintf(stderr, "       -o STR        Output file name. Default: stdout\n");
     fprintf(stderr, "       -r            Input format is row per line. Default: False\n");
@@ -40,42 +40,44 @@ void usageConjugateGradientMPI(){
 
 }
 
-int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
+int ConjugateGradientCUDA(int argc, char *argv[]) {
 
     int 			ret_code;
     int 			option;
 
     unsigned long 		*II;
     unsigned long 		*J;
-    double 			    *A;
+    double 			*A;
 
     unsigned long 		M;
-    unsigned long 		local_M;
     unsigned long 		N;
     unsigned long long 	nz;
 
 
-    double 			    *b;
+    double 			*b;
     unsigned long 		M_Vector;
     unsigned long 		N_Vector;
     unsigned long long 	nz_vector;
 
-    char			    *outputFileName = NULL;
-    int			        iterationNumber = 0;
+    char			*outputFileName = NULL;
+    int			iterationNumber = 0;
 
-    char			    *inputMatrixFile = NULL;
-    char			    *inputVectorFile = NULL;
+    char			*inputMatrixFile = NULL;
+    char			*inputVectorFile = NULL;
 
-    int			        inputFormatRow = 0;
-    int			        numThreads = 1;
+    int			numThreads = 1;
 
-    while ((option = getopt(argc, argv,"ro:i:t:")) >= 0) {
+    int			inputFormatRow = 0;
+    int			basicOps = 0;
+
+    while ((option = getopt(argc, argv,"bro:i:t:")) >= 0) {
         switch (option) {
             case 'o' :
                 //free(outputFileName);
 
                 outputFileName = (char *) malloc(sizeof(char)*strlen(optarg)+1);
                 strcpy(outputFileName,optarg);
+
                 break;
 
             case 'i' :
@@ -84,6 +86,9 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
 
             case 'r':
                 inputFormatRow = 1;
+                break;
+            case 'b':
+                basicOps = 1;
                 break;
 
             case 't':
@@ -96,14 +101,12 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
     }
 
     if ((optind + 2 > argc) || (optind + 3 <= argc)) {
-        usageConjugateGradientMPI();
+        usageConjugateGradient();
         return 0;
     }
 
-    openblas_set_num_threads(numThreads);
-
     if(outputFileName == NULL) {
-        outputFileName = (char *) malloc(sizeof(char)*6);
+        outputFileName = (char *) malloc(sizeof(char)*7);
         sprintf(outputFileName,"stdout");
     }
 
@@ -114,18 +117,26 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
     strcpy(inputVectorFile,argv[optind+1]);
 
     //Read matrix
-    if(inputFormatRow) {
-        if(!readDenseCoordinateMatrixMPIRowLine(inputMatrixFile,&II,&J,&A,&M,&local_M,&N,&nz,myid, numProcs)){
+
+    //Read matrix
+    if(inputFormatRow){
+
+        if(!readDenseCoordinateMatrixRowLine(inputMatrixFile,&II,&J,&A,&M,&N,&nz)){
+            fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
+            return 0;
+        }
+
+        //writeDenseVector("stdout",values,M,N,nz);
+
+
+    }
+    else {
+        if(!readDenseCoordinateMatrix(inputMatrixFile,&II,&J,&A,&M,&N,&nz)){
             fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
             return 0;
         }
     }
-    else{
-        if(!readDenseCoordinateMatrixMPI(inputMatrixFile,&II,&J,&A,&M,&local_M,&N,&nz,myid, numProcs)){
-            fprintf(stderr, "[%s] Can not read Matrix\n",__func__);
-            return 0;
-        }
-    }
+
 
 
     //Read vector
@@ -137,23 +148,29 @@ int ConjugateGradientMPI(int argc, char *argv[],int numProcs, int myid) {
 
 
     //double *y=(double *) malloc(nz_vector * sizeof(double));
-    fprintf(stderr,"[%s] Solving system using conjugate gradient method...\n",__func__);
-
+    fprintf(stderr,"[%s] Solving system using conjugate gradient method\n",__func__);
     double t_real = realtime();
 
-    ret_code = ConjugateGradientSolverMPI(II,J,A,M,local_M,N,nz,b,M_Vector,N_Vector,nz_vector, iterationNumber);
+    // Vector to store result
+    double *x=(double *) calloc(nz_vector,sizeof(double));
+
+    if(basicOps){
+        //ret_code = ConjugateGradientSolverBasicCUDA(II,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, x, iterationNumber);
+    }
+    else{
+        ret_code = ConjugateGradientSolverCUDA(II,J,A,M,N,nz,b,M_Vector,N_Vector,nz_vector, x, iterationNumber);
+    }
 
     fprintf(stderr, "\n[%s] Time spent in Conjugate Gradient: %.6f sec\n", __func__, realtime() - t_real);
 
-    if (myid == 0) {
-        if(ret_code){
+    if(ret_code){
 
-            writeDenseVector(outputFileName, b,M_Vector,N_Vector,nz_vector);
-        }
-        else{
-            fprintf(stderr,"[%s] Error executing ConjugateGradientSolver\n",__func__);
+        writeDenseVector(outputFileName, x,M_Vector,N_Vector,nz_vector);
 
-        }
+    }
+    else{
+        fprintf(stderr,"[%s] Error executing ConjugateGradientSolver\n",__func__);
+
     }
     return ret_code;
 }

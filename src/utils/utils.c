@@ -1,5 +1,5 @@
 /**
-  * Copyright 2016 José Manuel Abuín Mosquera <josemanuel.abuin@usc.es>
+  * Copyright 2019 José Manuel Abuín Mosquera <josemanuel.abuin@usc.es>
   * 
   * This file is part of Matrix Market Suite.
   *

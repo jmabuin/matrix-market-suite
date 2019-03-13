@@ -26,84 +26,83 @@
 int CreateDenseMatrixSymmetricDiagonallyDominant(char *fileName, unsigned long int numRows, unsigned long int numCols, unsigned int seed, double min, double max) {
 //Options: numRows numCols fileName seed
 
-	FILE *output;
-	//long nz;
-	int i, j;
+    FILE *output;
+    //long nz;
+    int i, j;
 
 
-	MM_typecode outputmatcode;
+    MM_typecode outputmatcode;
 
-	mm_initialize_typecode(&outputmatcode);
-	mm_set_matrix(&outputmatcode);
-	//mm_set_coordinate(&outputmatcode);
-	mm_set_dense(&outputmatcode);
-	mm_set_real(&outputmatcode);
-	mm_set_symmetric(&outputmatcode);
+    mm_initialize_typecode(&outputmatcode);
+    mm_set_matrix(&outputmatcode);
+    mm_set_coordinate(&outputmatcode);
+    //mm_set_dense(&outputmatcode);
+    mm_set_real(&outputmatcode);
+    mm_set_symmetric(&outputmatcode);
 
+    if(strcmp(fileName,"stdout")==0){
+        output = stdout;
+    }
+    else{
+        if ((output = fopen(fileName, "w")) == NULL){
+            fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
+            return 0;
+        }
+    }
 
-	if(strcmp(fileName,"stdout")==0){
-		output = stdout;
-	}
-	else{
-		if ((output = fopen(fileName, "w")) == NULL){
-			fprintf(stderr,"[%s] Unable to open file for writing\n",__func__);
-			return 0;
-		}
-	}
+    unsigned long long int nnz = numRows * numCols;
 
-	unsigned long long int nnz = numRows * numCols;
+    mm_write_banner(output, outputmatcode);
+    mm_write_mtx_crd_size(output, numRows, numCols, numRows*numCols);
 
-	mm_write_banner(output, outputmatcode);
-	mm_write_mtx_crd_size(output, numRows, numCols, numRows*numCols);
+    double *values =  (double *) calloc(nnz,sizeof(double));
+    double value = 0.0;
 
-	double *values =  (double *) calloc(nnz,sizeof(double));
-	double value = 0.0;
+    double *diagonalValues = (double *) calloc(numCols, sizeof(double));
 
-	double *diagonalValues = (double *) calloc(numCols, sizeof(double));
+    srand (seed);
 
-	srand (seed);
+    for(i = 0;i < numRows; i++){
 
-	for(i = 0;i < numRows; i++){
+        for(j = 0; j<= i; j++){
 
-		for(j = 0; j<= i; j++){
+            value = randfrom(min, max);
 
-			value = randfrom(min, max);
+            values[i*numCols+j] = value;
 
-			values[i*numCols+j] = value;
+            if(i!=j){
+                values[j*numCols+i] = value;
+                diagonalValues[j] = diagonalValues[j] + fabs(value);
+                diagonalValues[i] = diagonalValues[i] + fabs(value);
+            }
 
-			if(i!=j){
-				values[j*numCols+i] = value;
-				diagonalValues[j] = diagonalValues[j] + fabs(value);
-				diagonalValues[i] = diagonalValues[i] + fabs(value);
-			}
+        }
 
-		}
+        diagonalValues[i] = diagonalValues[i] + 1.0;
 
-		diagonalValues[i] = diagonalValues[i] + 1.0;
-
-	}
-
-
-	for(i = 0;i < numRows; i++){
-
-		for(j = 0 ; j < numCols; j++){
-
-			if(i!=j) {
-				fprintf(output, "%d %d %lg\n",i+1,j+1,values[i*numCols+j]);
-			}
-			else {
-				fprintf(output, "%d %d %lg\n",i+1,j+1,diagonalValues[i]);
-			}
+    }
 
 
-		}
+    for(i = 0;i < numRows; i++){
+
+        for(j = 0 ; j < numCols; j++){
+
+            if(i!=j) {
+                fprintf(output, "%d %d %lg\n",i+1,j+1,values[i*numCols+j]);
+            }
+            else {
+                fprintf(output, "%d %d %lg\n",i+1,j+1,diagonalValues[i]);
+            }
 
 
-	}
+        }
 
 
-	fclose(output);
+    }
 
-	return 1;
+
+    fclose(output);
+
+    return 1;
 }
 
